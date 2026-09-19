@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "Bovada HUD",
+  "version": "0.1.0",
+  "description": "Real-time poker HUD for Bovada",
+  "permissions": ["storage", "downloads", "unlimitedStorage", "identity"],
+  "host_permissions": [
+    "https://www.bovada.lv/*",
+    "http://localhost/*",
+    "https://api.webpokerhud.com/*"
+  ],
+  "background": {
+    "service_worker": "src/background.ts",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.bovada.lv/*"],
+      "js": ["src/injected.ts"],
+      "run_at": "document_start",
+      "world": "MAIN",
+      "all_frames": true
+    },
+    {
+      "matches": ["https://www.bovada.lv/*"],
+      "js": ["src/content_script.ts"],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
+  "action": {
+    "default_popup": "src/popup/index.html",
+    "default_title": "Bovada HUD"
+  },
+  "options_ui": {
+    "page": "src/panel/index.html",
+    "open_in_tab": true
+  }
+}

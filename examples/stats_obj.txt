@@ -1,0 +1,17 @@
+{
+    "event": "ping-average-roundtrip-time",
+    "siteId": 100,
+    "intToken": "9e51770f-b5b3-4eb2-89b9-173033dc10c0",
+    "pokerWsToken": "BB1DCD6A719C4209BD917A617F394BB4",
+    "gameServerIp": "10.51.29.164",
+    "gameServerPort": 7006,
+    "gameLimit": "NL",
+    "gameMode": "holdem",
+    "gameType": "quickSeat",
+    "buyIn": 1000,
+    "tableId": 37407309,
+    "playerId": "560201380440",
+    "numberOfSeats": 6,
+    "averageTime": 150.75,
+    "sampleSize": 20
+}

@@ -1,0 +1,19 @@
+{
+  "name": "bovada-hud",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "watch": "vite build --watch",
+    "build": "vite build",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.268",
+    "fake-indexeddb": "^6.2.5",
+    "typescript": "^5.4.0",
+    "vite": "^5.2.0",
+    "vite-plugin-web-extension": "^4.1.1",
+    "vitest": "^4.1.10"
+  }
+}

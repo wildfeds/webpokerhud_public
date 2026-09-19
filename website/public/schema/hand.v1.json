@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://webpokerhud.com/schema/hand.v1.json",
+  "title": "Hand",
+  "description": "One completed poker hand, as exported by the extension (JSONL: one Hand per line) and accepted by the Pro analysis API. Version 1 is additive-only: new fields may appear (validators should ignore unknown fields), existing fields never change meaning. A missing handVersion means 1. License: MIT.",
+  "type": "object",
+  "required": [
+    "handId", "tableId", "platform", "timestamp", "gameType", "stakes",
+    "maxSeats", "dealerSeat", "heroSeat", "players", "actions", "board",
+    "totalPot", "rake", "results"
+  ],
+  "properties": {
+    "handVersion": { "const": 1, "description": "Format version; absent means 1." },
+    "handId": { "type": "string", "description": "Platform-native hand id (e.g. Bovada stageNo)." },
+    "tableId": { "type": "string" },
+    "platform": { "type": "string", "description": "e.g. \"bovada\"" },
+    "timestamp": { "type": "integer", "description": "Unix milliseconds at hand start." },
+    "gameType": { "type": "string", "description": "e.g. \"nlhe\", \"plo\"" },
+    "stakes": {
+      "type": "object",
+      "required": ["sb", "bb"],
+      "properties": {
+        "sb": { "type": "number", "description": "Small blind in chips." },
+        "bb": { "type": "number", "description": "Big blind in chips." }
+      }
+    },
+    "maxSeats": { "type": "integer", "minimum": 2 },
+    "dealerSeat": { "type": "integer" },
+    "heroSeat": { "type": "integer" },
+    "players": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/player" },
+      "description": "Only seats that were dealt in."
+    },
+    "actions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/action" },
+      "description": "Full action history in order."
+    },
+    "board": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/card" },
+      "maxItems": 5,
+      "description": "Final board cards."
+    },
+    "totalPot": { "type": "number", "description": "Total pot before rake." },
+    "rake": { "type": "number" },
+    "results": { "type": "array", "items": { "$ref": "#/$defs/handResult" } }
+  },
+  "$defs": {
+    "card": {
+      "type": "string",
+      "pattern": "^[2-9TJQKA][cdhs]$",
+      "description": "Rank (2-9, T, J, Q, K, A) + suit (c, d, h, s), e.g. \"Ah\"."
+    },
+    "player": {
+      "type": "object",
+      "required": ["seat", "playerId", "startStack", "cards", "isHero"],
+      "properties": {
+        "seat": { "type": "integer" },
+        "playerId": {
+          "type": "string",
+          "description": "Username on named platforms; session-scoped id (\"<platform>:<tableId>:<seat>\") on anonymous platforms."
+        },
+        "startStack": { "type": "number", "description": "Stack at hand start, before posting blinds." },
+        "cards": {
+          "oneOf": [
+            { "type": "array", "items": { "$ref": "#/$defs/card" } },
+            { "type": "null" }
+          ],
+          "description": "Hole cards; null until revealed (showdown or hero's own)."
+        },
+        "isHero": { "type": "boolean" }
+      }
+    },
+    "action": {
+      "type": "object",
+      "required": ["seat", "playerId", "type", "amount", "totalStreetBet", "street", "stackAfter"],
+      "properties": {
+        "seat": { "type": "integer" },
+        "playerId": { "type": "string" },
+        "type": {
+          "enum": ["post_sb", "post_bb", "fold", "check", "call", "bet", "raise", "all_in", "show", "muck"],
+          "description": "\"bet\" is the first aggression on a street; \"raise\" is aggression after a bet/raise exists."
+        },
+        "amount": { "type": "number", "description": "Chips committed by this action (0 for fold/check/show/muck)." },
+        "totalStreetBet": { "type": "number", "description": "Player's total committed on this street after the action." },
+        "street": {
+          "enum": ["posting_blinds", "preflop", "flop", "turn", "river", "showdown"]
+        },
+        "stackAfter": { "type": "number", "description": "Stack remaining after the action." }
+      }
+    },
+    "handResult": {
+      "type": "object",
+      "required": ["seat", "playerId", "potWon", "netWon"],
+      "properties": {
+        "seat": { "type": "integer" },
+        "playerId": { "type": "string" },
+        "potWon": { "type": "number", "description": "Chips awarded from the pot; uncalled-bet returns are not included." },
+        "netWon": {
+          "type": "number",
+          "description": "Net chips for the whole hand (end stack minus start stack). With side pots a player may appear in several results; netWon repeats the same whole-hand total in each — do not sum across entries."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bovada HUD — Analysis</title>
+  <style>
+    :root {
+      --bg: #1a1a2e;
+      --panel: rgba(255,255,255,0.04);
+      --line: rgba(255,255,255,0.08);
+      --muted: #8a8aa8;
+      --pos: #7ec97e;
+      --neg: #ff6b6b;
+      --accent: #4a4ae0;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      font-size: 14px;
+      color: #e0e0e0;
+      background: var(--bg);
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+      padding: 14px 24px;
+    }
+    h1 { margin: 0 0 10px; font-size: 20px; color: #fff; }
+    .header-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+    /* Account chip (top right, Gmail-style) */
+    .account { display: flex; align-items: center; gap: 8px; min-height: 28px; }
+    .account-avatar {
+      width: 28px; height: 28px; border-radius: 50%; flex: 0 0 28px;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .account-avatar-fallback { background: var(--accent); color: #fff; font-weight: 600; font-size: 13px; }
+    .account-name {
+      font-weight: 600; color: #fff; font-size: 13px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px;
+    }
+    .account-tier {
+      font-size: 11px; font-weight: 600; padding: 1px 8px; border-radius: 10px;
+      background: rgba(255,255,255,0.1); color: var(--muted);
+    }
+    .account-tier.pro { background: rgba(126,201,126,0.18); color: var(--pos); }
+    .account-signin {
+      background: var(--accent); color: #fff; border: none; border-radius: 4px;
+      padding: 6px 12px; font-size: 13px; cursor: pointer;
+    }
+    .account-signin:hover { filter: brightness(1.15); }
+    .account-signout {
+      background: transparent; border: 1px solid rgba(255,255,255,0.2); color: var(--muted);
+      border-radius: 4px; padding: 4px 10px; font-size: 12px; cursor: pointer;
+    }
+    .account-signout:hover { color: #fff; }
+    .account-note { color: var(--muted); font-size: 13px; }
+    .account-error { cursor: help; }
+    h2 {
+      margin: 0 0 10px;
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    main { padding: 20px 24px 60px; max-width: 1100px; }
+    .controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    select, #refresh {
+      background: #26264a;
+      color: #e0e0e0;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 4px;
+      padding: 5px 8px;
+      font-size: 13px;
+    }
+    #refresh { cursor: pointer; }
+    #refresh:hover { background: #32325e; }
+    #refresh:disabled { opacity: 0.6; cursor: default; }
+    .tabs { display: flex; gap: 4px; margin-top: 12px; }
+    .tab {
+      padding: 7px 14px;
+      background: transparent;
+      color: var(--muted);
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .tab.active { color: #fff; border-bottom-color: var(--accent); }
+    .view { display: none; }
+    .view.active { display: block; }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+    .card {
+      background: var(--panel);
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .card .k { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .card .v { font-size: 22px; font-weight: 600; color: #fff; margin-top: 4px; }
+    .section { margin-bottom: 28px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 7px 10px; text-align: right; white-space: nowrap; }
+    th:first-child, td:first-child { text-align: left; }
+    thead th { color: var(--muted); font-weight: 500; font-size: 12px; border-bottom: 1px solid var(--line); }
+    tbody tr { border-bottom: 1px solid var(--line); }
+    tbody tr.clickable { cursor: pointer; }
+    tbody tr.clickable:hover { background: rgba(255,255,255,0.05); }
+    .muted { color: var(--muted); }
+    .pos { color: var(--pos); }
+    .neg { color: var(--neg); }
+    .chart-wrap { background: var(--panel); border-radius: 8px; padding: 16px; }
+    .chart-legend { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 10px; font-size: 13px; }
+    .chart-legend .swatch {
+      display: inline-block; width: 14px; height: 3px; border-radius: 2px;
+      vertical-align: middle; margin-right: 6px;
+    }
+    /* Starting-hand matrix */
+    #matrix { overflow-x: auto; }
+    .matrix-grid {
+      display: grid;
+      grid-template-columns: repeat(13, minmax(52px, 1fr));
+      gap: 3px;
+      min-width: 740px;
+    }
+    .matrix-cell {
+      border-radius: 4px;
+      padding: 5px 2px 4px;
+      text-align: center;
+      background: var(--panel);
+      line-height: 1.25;
+    }
+    .matrix-cell .key { font-size: 12px; font-weight: 600; color: #e0e0e0; }
+    .matrix-cell .n { font-size: 10px; color: var(--muted); }
+    .matrix-cell.dealt { cursor: pointer; }
+    .matrix-cell.dealt:hover { outline: 1px solid rgba(255,255,255,0.35); }
+    /* Hands-tab filter bar */
+    .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+    .filter-bar select { font-size: 12px; padding: 3px 6px; }
+    .filter-bar .link-btn {
+      background: none; border: none; color: var(--muted); cursor: pointer;
+      font-size: 12px; text-decoration: underline; padding: 0;
+    }
+    .filter-bar .link-btn:hover { color: #fff; }
+    .filter-bar .preset {
+      background: #26264a;
+      color: #e0e0e0;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      padding: 3px 10px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .filter-bar .preset:hover { background: #32325e; }
+    .filter-bar .preset.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    th.sortable { cursor: pointer; }
+    th.sortable:hover { color: #fff; }
+    /* Hands-tab filter chip */
+    .filter-chip {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #26264a; border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px; padding: 3px 10px; font-size: 12px; margin-bottom: 10px;
+    }
+    .filter-chip button {
+      background: none; border: none; color: var(--muted); cursor: pointer;
+      font-size: 13px; padding: 0; line-height: 1;
+    }
+    .filter-chip button:hover { color: #fff; }
+    .adv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+    .adv-grid .card { padding: 12px 16px; }
+    .adv-grid h3 { margin: 0 0 8px; font-size: 13px; color: #fff; }
+    .adv-row { display: flex; justify-content: space-between; padding: 3px 0; }
+    .adv-row .lbl { color: var(--muted); }
+    .adv-row .low { color: #66668a; }   /* small sample */
+    .adv-note { color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .adv-grid .adv-note { grid-column: 1 / -1; }
+    .leak {
+      display: flex;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      background: var(--panel);
+      margin-bottom: 8px;
+    }
+    .leak .dot { flex: 0 0 8px; height: 8px; border-radius: 50%; margin-top: 6px; }
+    .leak.warn .dot { background: var(--neg); }
+    .leak.info .dot { background: var(--muted); }
+    .leak .title { font-weight: 600; color: #fff; }
+    .leak .detail { color: var(--muted); font-size: 13px; margin-top: 2px; }
+    .empty { color: var(--muted); padding: 20px 0; }
+    /* Server-error banner */
+    #server-banner {
+      margin-top: 10px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: rgba(255,107,107,0.12);
+      border: 1px solid rgba(255,107,107,0.4);
+      color: #ffb3b3;
+      font-size: 13px;
+    }
+    #server-banner[hidden] { display: none; }
+    /* Pro-only (locked) views */
+    .tab.locked::after { content: ' 🔒'; font-size: 11px; }
+    .upgrade-box {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 28px 24px;
+      text-align: center;
+      max-width: 520px;
+      margin: 20px auto;
+    }
+    .upgrade-box .upgrade-title { font-size: 16px; font-weight: 600; color: #fff; }
+    .upgrade-box p { color: var(--muted); line-height: 1.5; }
+    .upgrade-btn {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 8px 18px;
+      border-radius: 6px;
+      background: var(--accent);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .upgrade-btn:hover { filter: brightness(1.15); }
+    /* Hand replay */
+    .hand-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+    /* min-width:0 lets each column shrink instead of overflowing into the other */
+    .hand-layout > div { min-width: 0; }
+    #hands-table { overflow-x: auto; }
+    @media (max-width: 820px) { .hand-layout { grid-template-columns: 1fr; } }
+    .replay {
+      background: var(--panel);
+      border-radius: 8px;
+      padding: 16px;
+      min-height: 200px;
+      position: sticky;
+      top: 120px;
+    }
+    .street-block { margin-bottom: 14px; }
+    .street-head {
+      color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;
+      display: flex; justify-content: space-between; margin-bottom: 6px;
+      border-bottom: 1px solid var(--line); padding-bottom: 4px;
+    }
+    .act { display: flex; justify-content: space-between; padding: 2px 0; }
+    .act .who { color: #cfcfe6; }
+    .act.hero .who { color: #ffd479; font-weight: 600; }
+    .board-cards { font-size: 18px; letter-spacing: 2px; }
+    .result-line { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
+    /* Stat glossary popover */
+    .stat-term {
+      cursor: help;
+      text-decoration: underline dotted rgba(255,255,255,0.35);
+      text-underline-offset: 3px;
+    }
+    #stat-pop {
+      position: absolute;
+      z-index: 100;
+      width: 340px;
+      max-width: calc(100vw - 24px);
+      background: #23233f;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 12px 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      font-size: 13px;
+    }
+    #stat-pop[hidden] { display: none; }
+    #stat-pop .pop-title { font-weight: 600; color: #fff; margin-bottom: 4px; }
+    #stat-pop .pop-def { color: var(--muted); line-height: 1.45; }
+    #stat-pop .pop-link { display: inline-block; margin-top: 8px; color: #9f9fff; text-decoration: none; }
+    #stat-pop .pop-link:hover { text-decoration: underline; }
+    #stat-pop .pop-replay {
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid var(--line);
+      max-height: 300px;
+      overflow: auto;
+    }
+    #stat-pop .pop-replay[hidden] { display: none; }
+    #stat-pop .pop-replay .board-cards { font-size: 15px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-top">
+      <h1>Bovada HUD — Analysis</h1>
+      <div id="account" class="account"></div>
+    </div>
+    <div class="controls">
+      <select id="range">
+        <option value="0">All time</option>
+        <option value="86400000">Last 24 hours</option>
+        <option value="604800000">Last 7 days</option>
+        <option value="2592000000">Last 30 days</option>
+      </select>
+      <select id="level"></select>
+      <button id="refresh" title="Recompute all stats from the latest stored hands">↻ Refresh</button>
+      <span id="summary-line" class="muted"></span>
+    </div>
+    <div id="server-banner" hidden></div>
+    <div class="tabs">
+      <button class="tab active" data-view="overview">Overview</button>
+      <button class="tab" data-view="positions">Positions</button>
+      <button class="tab" data-view="cards">Cards</button>
+      <button class="tab" data-view="sessions">Sessions</button>
+      <button class="tab" data-view="trends">Trends</button>
+      <button class="tab" data-view="hands">Hands</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="view-overview" class="view active">
+      <div id="summary-cards" class="cards"></div>
+
+      <div class="section">
+        <h2>By stake level</h2>
+        <div id="stake-table"></div>
+      </div>
+
+      <div class="section">
+        <h2>Winnings ($) vs hands</h2>
+        <div id="chart" class="chart-wrap"></div>
+      </div>
+
+      <div class="section">
+        <h2>Stats</h2>
+        <div id="advanced" class="adv-grid"></div>
+      </div>
+
+      <div class="section">
+        <h2>Leak highlights</h2>
+        <div id="leaks"></div>
+      </div>
+    </section>
+
+    <section id="view-positions" class="view">
+      <div class="section">
+        <h2>Stats by position</h2>
+        <div id="position-table"></div>
+      </div>
+    </section>
+
+    <section id="view-cards" class="view">
+      <div class="section">
+        <h2>Starting hands — net result</h2>
+        <div id="matrix"></div>
+        <div class="adv-note" style="margin-top:12px">
+          Pairs on the diagonal, <strong>suited</strong> above, <strong>offsuit</strong> below.
+          Cell shade = net result (green won / red lost); the small number is hands dealt.
+          Click a cell to see those hands in the Hands tab.
+        </div>
+      </div>
+    </section>
+
+    <section id="view-sessions" class="view">
+      <div class="section">
+        <h2>Net per session ($)</h2>
+        <div id="session-chart" class="chart-wrap"></div>
+      </div>
+      <div class="section">
+        <h2>Sessions</h2>
+        <div id="sessions-table"></div>
+      </div>
+    </section>
+
+    <section id="view-trends" class="view">
+      <div class="section">
+        <div class="controls" style="margin-bottom:14px">
+          <label class="muted" for="trend-window">Rolling window</label>
+          <select id="trend-window">
+            <option value="100">100 hands</option>
+            <option value="200">200 hands</option>
+            <option value="500">500 hands</option>
+          </select>
+        </div>
+        <h2>VPIP / PFR (%) — rolling</h2>
+        <div id="trend-pct" class="chart-wrap"></div>
+      </div>
+      <div class="section">
+        <h2>bb / 100 — rolling</h2>
+        <div id="trend-bb" class="chart-wrap"></div>
+      </div>
+    </section>
+
+    <section id="view-hands" class="view">
+      <div class="hand-layout">
+        <div>
+          <h2>Hand history</h2>
+          <div id="hand-filters" class="filter-bar"></div>
+          <div id="hands-table"></div>
+        </div>
+        <div>
+          <h2>Replay</h2>
+          <div id="replay" class="replay"><span class="empty">Select a hand to replay.</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="./index.ts"></script>
+</body>
+</html>

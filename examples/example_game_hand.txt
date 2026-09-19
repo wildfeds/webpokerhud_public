@@ -1,0 +1,190 @@
+{
+    "handId": "4904148985",
+    "tableId": "37407900",
+    "platform": "bovada",
+    "timestamp": 1784171540306,
+    "gameType": "nlhe",
+    "stakes": {
+        "sb": 5,
+        "bb": 10
+    },
+    "maxSeats": 9,
+    "dealerSeat": 4,
+    "heroSeat": 3,
+    "players": [
+        {
+            "seat": 2,
+            "playerId": "bovada:37407900:2",
+            "startStack": 1006,
+            "cards": null,
+            "isHero": false
+        },
+        {
+            "seat": 3,
+            "playerId": "560201380440500",
+            "startStack": 0,
+            "cards": null,
+            "isHero": true
+        },
+        {
+            "seat": 4,
+            "playerId": "bovada:37407900:4",
+            "startStack": 2727,
+            "cards": [
+                "Qd",
+                "Qh"
+            ],
+            "isHero": false
+        },
+        {
+            "seat": 5,
+            "playerId": "bovada:37407900:5",
+            "startStack": 1910,
+            "cards": [
+                "Ts",
+                "Qs"
+            ],
+            "isHero": false
+        },
+        {
+            "seat": 6,
+            "playerId": "bovada:37407900:6",
+            "startStack": 10,
+            "cards": null,
+            "isHero": false
+        }
+    ],
+    "actions": [
+        {
+            "seat": 5,
+            "playerId": "bovada:37407900:5",
+            "type": "post_sb",
+            "amount": 5,
+            "totalStreetBet": 5,
+            "street": "posting_blinds",
+            "stackAfter": 1251
+        },
+        {
+            "seat": 6,
+            "playerId": "bovada:37407900:6",
+            "type": "post_bb",
+            "amount": 10,
+            "totalStreetBet": 10,
+            "street": "posting_blinds",
+            "stackAfter": 1344
+        },
+        {
+            "seat": 2,
+            "playerId": "bovada:37407900:2",
+            "type": "fold",
+            "amount": 0,
+            "totalStreetBet": 0,
+            "street": "preflop",
+            "stackAfter": 624
+        },
+        {
+            "seat": 3,
+            "playerId": "560201380440500",
+            "type": "fold",
+            "amount": 0,
+            "totalStreetBet": 0,
+            "street": "preflop",
+            "stackAfter": 1006
+        },
+        {
+            "seat": 4,
+            "playerId": "bovada:37407900:4",
+            "type": "bet",
+            "amount": 10,
+            "totalStreetBet": 10,
+            "street": "preflop",
+            "stackAfter": 955
+        },
+        {
+            "seat": 5,
+            "playerId": "bovada:37407900:5",
+            "type": "raise",
+            "amount": 30,
+            "totalStreetBet": 35,
+            "street": "preflop",
+            "stackAfter": 1116
+        },
+        {
+            "seat": 6,
+            "playerId": "bovada:37407900:6",
+            "type": "fold",
+            "amount": 0,
+            "totalStreetBet": 0,
+            "street": "preflop",
+            "stackAfter": 1344
+        },
+        {
+            "seat": 4,
+            "playerId": "bovada:37407900:4",
+            "type": "raise",
+            "amount": 90,
+            "totalStreetBet": 100,
+            "street": "preflop",
+            "stackAfter": 755
+        },
+        {
+            "seat": 5,
+            "playerId": "bovada:37407900:5",
+            "type": "call",
+            "amount": 65,
+            "totalStreetBet": 100,
+            "street": "preflop",
+            "stackAfter": 1016
+        },
+        {
+            "seat": 5,
+            "playerId": "bovada:37407900:5",
+            "type": "check",
+            "amount": 0,
+            "totalStreetBet": 0,
+            "street": "flop",
+            "stackAfter": 1016
+        },
+        {
+            "seat": 4,
+            "playerId": "bovada:37407900:4",
+            "type": "call",
+            "amount": 466,
+            "totalStreetBet": 466,
+            "street": "flop",
+            "stackAfter": 289
+        },
+        {
+            "seat": 5,
+            "playerId": "bovada:37407900:5",
+            "type": "all_in",
+            "amount": 466,
+            "totalStreetBet": 466,
+            "street": "flop",
+            "stackAfter": 0
+        },
+        {
+            "seat": 4,
+            "playerId": "bovada:37407900:4",
+            "type": "all_in",
+            "amount": 0,
+            "totalStreetBet": 289,
+            "street": "flop",
+            "stackAfter": 0
+        }
+    ],
+    "board": [
+        "9d",
+        "5s"
+    ],
+    "totalPot": 2000,
+    "rake": 0,
+    "results": [
+        {
+            "seat": 4,
+            "playerId": "bovada:37407900:4",
+            "potWon": 1900,
+            "netWon": 1334
+        }
+    ]
+}

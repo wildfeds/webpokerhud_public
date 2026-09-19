@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bovada HUD</title>
+  <style>
+    body {
+      width: 320px;
+      padding: 16px;
+      font-family: system-ui, sans-serif;
+      font-size: 13px;
+      color: #e0e0e0;
+      background: #1a1a2e;
+      margin: 0;
+    }
+    h2 { margin: 0 0 10px; font-size: 16px; color: #fff; }
+    h3 {
+      margin: 14px 0 6px;
+      font-size: 11px;
+      color: #8a8aa8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+    table { width: 100%; border-collapse: collapse; }
+    td, th { padding: 2px 4px; text-align: left; }
+    td:last-child, th:last-child { text-align: right; }
+    th { color: #8a8aa8; font-weight: 500; font-size: 11px; }
+    tr + tr td { border-top: 1px solid rgba(255,255,255,0.08); }
+    .muted { color: #888; }
+    .pos { color: #7ec97e; }
+    .neg { color: #ff6b6b; }
+    .row { display: flex; justify-content: space-between; margin: 2px 0; }
+    .controls { display: flex; gap: 8px; margin: 10px 0 2px; }
+    .controls select {
+      flex: 1;
+      background: #26264a;
+      color: #e0e0e0;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 4px;
+      padding: 3px 4px;
+      font-size: 12px;
+    }
+    .level {
+      margin-top: 12px;
+      padding: 8px 10px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 6px;
+    }
+    .level-head {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+      color: #fff;
+      font-weight: 600;
+    }
+    .level-head .hands { color: #8a8aa8; font-weight: 400; }
+    #chart { margin-top: 10px; }
+    .chart-title {
+      font-size: 11px;
+      color: #8a8aa8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 2px;
+    }
+    button {
+      margin-top: 12px;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      background: #4a4ae0;
+      color: #fff;
+      cursor: pointer;
+    }
+    button:disabled { background: #555; cursor: default; }
+    #status { margin-top: 6px; color: #8f8; min-height: 1em; }
+    /* Account chip */
+    .account { display: flex; align-items: center; gap: 8px; min-height: 28px; margin: 0 0 10px; }
+    .account-avatar {
+      width: 24px; height: 24px; border-radius: 50%; flex: 0 0 24px;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .account-avatar-fallback { background: #4a4ae0; color: #fff; font-weight: 600; font-size: 12px; }
+    .account-name {
+      font-weight: 600; color: #fff;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 140px;
+    }
+    .account-tier {
+      font-size: 11px; font-weight: 600; padding: 1px 8px; border-radius: 10px;
+      background: rgba(255,255,255,0.1); color: #8a8aa8;
+    }
+    .account-tier.pro { background: rgba(126,201,126,0.18); color: #7ec97e; }
+    .account-signin, .account-signout { margin-top: 0; padding: 5px 10px; font-size: 12px; }
+    .account-signout { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #8a8aa8; }
+    .account-signout:hover { color: #fff; }
+    .account-note { color: #8a8aa8; }
+    .account-error { cursor: help; }
+  </style>
+</head>
+<body>
+  <h2>Bovada HUD</h2>
+  <div id="account" class="account"></div>
+  <label><input type="checkbox" id="hud-toggle" /> Show HUD overlay on tables</label>
+
+  <div class="controls">
+    <select id="range">
+      <option value="0">All time</option>
+      <option value="86400000">Last 24 hours</option>
+      <option value="604800000">Last 7 days</option>
+      <option value="2592000000">Last 30 days</option>
+    </select>
+    <select id="level"></select>
+  </div>
+
+  <h3>Hero stats</h3>
+  <div id="stats" class="muted">loading…</div>
+
+  <div id="chart"></div>
+
+  <button id="panel-btn">Open analysis panel</button>
+  <button id="export-btn">Export hands</button>
+  <button id="import-btn">Import hands</button>
+  <input type="file" id="import-file" accept=".jsonl,.ndjson,application/x-ndjson" hidden />
+  <p id="status"></p>
+  <p id="storage" class="muted"></p>
+  <script type="module" src="./index.ts"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+160|{"seq":3,"tDiff":0,"data":{"pid":"CO_OPTION_INFO","bblind":10,"sblind":5,"gameType":2,"gameType2":5,"hiLow":0,"maxSeat":9,"maxStakes":0,"minStakes":0,"real":1}}	164	
+22:09:18.589
+412|{"seq":4,"tDiff":0,"data":{"pid":"CO_TABLE_INFO","time":1,"currentSeat":3,"dealerSeat":3,"lockSeat":0,"tableState":32768,"seatState":[16,0,80,16,16,16,0,0,0],"account":[1346,0,811,1030,1016,863,0,0,0],"pcard3":[32896,32896],"pcard4":[32896,32896],"pcard6":[32896,32896],"pbet":[0,0,0,0,0,0,0,0,0],"curPot":[171,0,0,0,0,0,0,0,0],"curRake":[8,0,0,0,0,0,0,0,0],"potCount":0,"totalpot":171,"bcard":[32,30,13,17,25]}}	416	
+22:09:18.590
+121|{"seq":6,"tDiff":0,"data":{"pid":"PLAY_SEAT_INFO","type":1,"seat":2,"state":16,"account":0,"nickName":"560201380440500"}}	125	
+22:09:18.592
+89|{"seq":7,"tDiff":39,"data":{"type":2,"seat":2,"cash":1000,"pid":"PLAY_ACCOUNT_CASH_RES"}}	92	
+22:09:18.592
+75|{"seq":8,"tDiff":0,"data":{"add":0,"seat":2,"pid":"PLAY_SEAT_RESERVATION"}}	78	
+22:09:18.593
+{"pid":"SYS_MSG_V2","chat":"_amIBlocked_","seat":2}	51	
+22:09:18.692
+171|{"seq":11,"tDiff":585,"data":{"type":1,"seat":2,"displayMax":1000,"displayMin":300,"allowedMax":0,"allowedMin":0,"account":21466,"defaultBuyin":0,"pid":"PLAY_BUYIN_INFO"}}

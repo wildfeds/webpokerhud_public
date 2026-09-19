@@ -1,0 +1,694 @@
+f0c942b4|0|X|	44	
+13:50:22.180
+{"gid":"Join","ip":"10.51.29.228","port":7000,"bTournament":0}	62	
+13:50:24.448
+43|{"seq":0,"tDiff":0,"data":{"gid":"Joined"}}	46	
+13:50:24.713
+{"pid":"CONNECT_INFO","siNo":17,"highVer":1,"lowVer":3,"siteKey":2110,"tableNo":37387340,"userID":"560201380440","userPW":"3577BB088DF845C1AC88A2E816E657BD","mobile":1,"zoneEntryNo":0}	184	
+13:50:24.721
+162|{"seq":1,"tDiff":219,"data":[{"pid":"CONNECT_LOGIN_INFO","nickName":"560201380440500"},{"tableNo":37387340,"pid":"PLAY_TABLE_NUMBER"},{"pid":"PLAY_INIT_OPTION"}]}	166	
+13:50:24.930
+75|{"seq":2,"tDiff":0,"data":{"pid":"PLAY_STAGE_INFO","stageNo":"4903352066"}}	78	
+13:50:24.969
+160|{"seq":3,"tDiff":0,"data":{"pid":"CO_OPTION_INFO","bblind":10,"sblind":5,"gameType":2,"gameType2":5,"hiLow":0,"maxSeat":9,"maxStakes":0,"minStakes":0,"real":1}}	164	
+13:50:24.970
+450|{"seq":4,"tDiff":1,"data":{"pid":"CO_TABLE_INFO","time":13,"currentSeat":2,"dealerSeat":1,"lockSeat":0,"tableState":32,"seatState":[16,80,0,16,16,80,0,0,0],"account":[172,1186,0,318,998,1338,0,0,0],"pcard1":[32896,32896],"pcard2":[32896,32896],"pcard4":[32896,32896],"pcard5":[32896,32896],"pcard6":[32896,32896],"pbet":[0,0,0,0,0,0,0,0,0],"curPot":[114,0,0,0,0,0,0,0,0],"curRake":[5,0,0,0,0,0,0,0,0],"potCount":0,"totalpot":114,"bcard":[2,33,41,4]}}	454	
+13:50:24.972
+76|{"seq":5,"tDiff":0,"data":{"type":3,"data":30,"dwData":30,"pid":"SYS_INFO"}}	79	
+13:50:24.974
+121|{"seq":6,"tDiff":0,"data":{"pid":"PLAY_SEAT_INFO","type":1,"seat":3,"state":16,"account":0,"nickName":"560201380440500"}}	125	
+13:50:24.975
+88|{"seq":7,"tDiff":0,"data":{"type":2,"seat":3,"cash":1000,"pid":"PLAY_ACCOUNT_CASH_RES"}}	91	
+13:50:24.976
+76|{"seq":8,"tDiff":38,"data":{"add":0,"seat":3,"pid":"PLAY_SEAT_RESERVATION"}}	79	
+13:50:24.977
+{"availableMoney":15419,"cash":0,"pid":"PLAY_ACCOUNT_CASH_REQ","type":0}	72	
+13:50:25.054
+{"pid":"SYS_MSG_V2","chat":"_amIBlocked_","seat":3}	51	
+13:50:25.095
+74|{"seq":9,"tDiff":0,"data":{"amountToPost":10,"pid":"CO_PRESELECT_BLINDS"}}	77	
+13:50:25.118
+58|{"seq":10,"tDiff":0,"data":{"pid":"CO_SHOW_BTN","show":1}}	61	
+13:50:25.132
+171|{"seq":11,"tDiff":273,"data":{"type":1,"seat":3,"displayMax":1000,"displayMin":300,"allowedMax":0,"allowedMin":0,"account":15419,"defaultBuyin":0,"pid":"PLAY_BUYIN_INFO"}}	175	
+13:50:25.242
+80|{"seq":12,"tDiff":63,"data":{"seat":3,"chat":"_amIBlocked_","pid":"SYS_MSG_V2"}}	83	
+13:50:25.329
+{"pid":"CO_CHECKOPTION_INFO","type":1,"check":1}	48	
+13:50:26.513
+106|{"seq":13,"tDiff":3141,"data":{"pid":"CO_SELECT_INFO","seat":2,"btn":64,"bet":0,"raise":0,"account":1186}}	110	
+13:50:28.445
+62|{"seq":14,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	65	
+13:50:28.533
+64|{"seq":15,"tDiff":0,"data":{"seat":6,"pid":"CO_CURRENT_PLAYER"}}	67	
+13:50:28.533
+106|{"seq":16,"tDiff":4289,"data":{"pid":"CO_SELECT_INFO","seat":6,"btn":64,"bet":0,"raise":0,"account":1338}}	110	
+13:50:32.735
+106|{"seq":17,"tDiff":0,"data":{"pid":"CO_CHIPTABLE_INFO","seat":0,"potCount":0,"curPot":[114],"curRake":[5]}}	110	
+13:50:32.821
+68|{"seq":18,"tDiff":0,"data":{"tableState":64,"pid":"CO_TABLE_STATE"}}	71	
+13:50:32.827
+69|{"seq":19,"tDiff":0,"data":{"pos":5,"card":1,"pid":"CO_BCARD1_INFO"}}	72	
+13:50:32.828
+62|{"seq":20,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	65	
+13:50:32.829
+64|{"seq":21,"tDiff":0,"data":{"seat":2,"pid":"CO_CURRENT_PLAYER"}}	67	
+13:50:32.830
+106|{"seq":22,"tDiff":7882,"data":{"pid":"CO_SELECT_INFO","seat":2,"btn":64,"bet":0,"raise":0,"account":1186}}	110	
+13:50:40.617
+62|{"seq":23,"tDiff":1,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	65	
+13:50:40.704
+64|{"seq":24,"tDiff":0,"data":{"seat":6,"pid":"CO_CURRENT_PLAYER"}}	67	
+13:50:40.705
+106|{"seq":25,"tDiff":1968,"data":{"pid":"CO_SELECT_INFO","seat":6,"btn":64,"bet":0,"raise":0,"account":1338}}	110	
+13:50:42.587
+106|{"seq":26,"tDiff":0,"data":{"pid":"CO_CHIPTABLE_INFO","seat":0,"potCount":0,"curPot":[114],"curRake":[5]}}	110	
+13:50:42.674
+71|{"seq":27,"tDiff":0,"data":{"tableState":32768,"pid":"CO_TABLE_STATE"}}	74	
+13:50:42.675
+84|{"seq":28,"tDiff":0,"data":{"pid":"CO_PCARD_INFO","type":0,"seat":2,"card":[50,12]}}
+106|{"seq":22,"tDiff":7882,"data":{"pid":"CO_SELECT_INFO","seat":2,"btn":64,"bet":0,"raise":0,"account":1186}}	110	
+13:50:40.617
+62|{"seq":23,"tDiff":1,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	65	
+13:50:40.704
+64|{"seq":24,"tDiff":0,"data":{"seat":6,"pid":"CO_CURRENT_PLAYER"}}	67	
+13:50:40.705
+106|{"seq":25,"tDiff":1968,"data":{"pid":"CO_SELECT_INFO","seat":6,"btn":64,"bet":0,"raise":0,"account":1338}}	110	
+13:50:42.587
+106|{"seq":26,"tDiff":0,"data":{"pid":"CO_CHIPTABLE_INFO","seat":0,"potCount":0,"curPot":[114],"curRake":[5]}}	110	
+13:50:42.674
+71|{"seq":27,"tDiff":0,"data":{"tableState":32768,"pid":"CO_TABLE_STATE"}}	74	
+13:50:42.675
+84|{"seq":28,"tDiff":0,"data":{"pid":"CO_PCARD_INFO","type":0,"seat":2,"card":[50,12]}}	87	
+13:50:42.675
+70|{"seq":29,"tDiff":0,"data":{"seat":2,"btn":8192,"pid":"CO_SHOW_INFO"}}	73	
+13:50:42.676
+61|{"seq":30,"tDiff":0,"data":{"time":2,"pid":"PLAY_TIME_INFO"}}	64	
+13:50:42.676
+64|{"seq":31,"tDiff":0,"data":{"seat":6,"pid":"CO_CURRENT_PLAYER"}}	67	
+13:50:42.676
+73|{"seq":32,"tDiff":329,"data":{"seat":6,"btn":16384,"pid":"CO_SHOW_INFO"}}	76	
+13:50:42.916
+71|{"seq":33,"tDiff":0,"data":{"tableState":65536,"pid":"CO_TABLE_STATE"}}	74	
+13:50:43.002
+120|{"seq":34,"tDiff":47,"data":{"pid":"CO_RESULT_INFO","account":[172,1295,1000,318,998,1338,0,0,0],"handHi2":[4,2,1,0,3]}}	124	
+13:50:43.003
+168|{"seq":35,"tDiff":0,"data":{"pid":"CO_POT_INFO","kicker":1,"kickerCard":[0,50,0,0,0,0,0,0,0],"potNo":0,"returnHi":[0,109,0,0,0,0,0,0,0],"returnLo":[0,0,0,0,0,0,0,0,0]}}	172	
+13:50:43.003
+57|{"seq":36,"tDiff":16,"data":{"pid":"PLAY_STAGE_END_REQ"}}	60	
+13:50:43.003
+{"pid":"PLAY_STAGE_END_RES","stageNo":"4903352066"}	51	
+13:50:44.016
+79|{"seq":37,"tDiff":2296,"data":{"pid":"PLAY_STAGE_INFO","stageNo":"4903352066"}}	82	
+13:50:45.274
+80|{"seq":38,"tDiff":0,"data":{"pid":"CO_LAST_HAND_NUMBER","stageNo":"4903352066"}}	83	
+13:50:45.289
+53|{"seq":39,"tDiff":0,"data":{"pid":"PLAY_CLEAR_INFO"}}	56	
+13:50:45.292
+61|{"seq":40,"tDiff":0,"data":{"seat":1,"pid":"CO_DEALER_SEAT"}}	64	
+13:50:45.292
+77|{"seq":41,"tDiff":15,"data":{"pid":"PLAY_STAGE_INFO","stageNo":"4903352383"}}	80	
+13:50:45.293
+67|{"seq":42,"tDiff":0,"data":{"tableState":2,"pid":"CO_TABLE_STATE"}}	70	
+13:50:45.293
+61|{"seq":43,"tDiff":0,"data":{"seat":2,"pid":"CO_DEALER_SEAT"}}	64	
+13:50:45.293
+61|{"seq":44,"tDiff":0,"data":{"seat":2,"pid":"CO_DEALER_SEAT"}}	64	
+13:50:45.293
+67|{"seq":45,"tDiff":0,"data":{"tableState":4,"pid":"CO_TABLE_STATE"}}	70	
+13:50:45.293
+115|{"seq":46,"tDiff":0,"data":{"pid":"CO_BLIND_INFO","seat":4,"account":308,"baseStakes":0,"btn":4,"bet":10,"dead":0}}	119	
+13:50:45.293
+67|{"seq":47,"tDiff":0,"data":{"tableState":8,"pid":"CO_TABLE_STATE"}}	70	
+13:50:45.293
+143|{"seq":48,"tDiff":0,"data":{"pid":"CO_CARDTABLE_INFO","seat1":[32896,32896],"seat2":[32896,32896],"seat4":[32896,32896],"seat6":[32896,32896]}}	147	
+13:50:45.293
+62|{"seq":49,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	65	
+13:50:45.294
+64|{"seq":50,"tDiff":0,"data":{"seat":6,"pid":"CO_CURRENT_PLAYER"}}	67	
+13:50:45.377
+109|{"seq":51,"tDiff":3047,"data":{"pid":"CO_SELECT_INFO","seat":6,"btn":512,"bet":10,"raise":30,"account":1308}}	113	
+13:50:48.335
+62|{"seq":52,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	65	
+13:50:48.424
+64|{"seq":53,"tDiff":0,"data":{"seat":1,"pid":"CO_CURRENT_PLAYER"}}	67	
+13:50:48.424
+{"pid":"PING","uuid":"aba444bd-713c-4da8-8489-9ddc83b5f1c1"}	60	
+13:50:52.187
+94|{"seq":54,"tDiff":4015,"data":{"pid": "PONG", "uuid": "aba444bd-713c-4da8-8489-9ddc83b5f1c1"}}	97	
+13:50:52.351
+107|{"seq":55,"tDiff":6907,"data":{"pid":"CO_SELECT_INFO","seat":1,"btn":256,"bet":30,"raise":0,"account":142}}	111	
+13:50:59.258
+62|{"seq":56,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	65	
+13:50:59.345
+64|{"seq":57,"tDiff":0,"data":{"seat":2,"pid":"CO_CURRENT_PLAYER"}}	67	
+13:50:59.345
+107|{"seq":58,"tDiff":968,"data":{"pid":"CO_SELECT_INFO","seat":2,"btn":1024,"bet":0,"raise":0,"account":1295}}	111	
+13:51:00.229
+62|{"seq":59,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	65	
+13:51:00.321
+64|{"seq":60,"tDiff":0,"data":{"seat":4,"pid":"CO_CURRENT_PLAYER"}}	67	
+13:51:00.321
+113|{"seq":61,"tDiff":15470,"data":{"pid":"PLAY_SEAT_INFO","type":1,"seat":4,"state":32,"account":308,"nickName":""}}	117	
+13:51:15.697
+75|{"seq":62,"tDiff":0,"data":{"amountToPost":10,"pid":"CO_PRESELECT_BLINDS"}}	78	
+13:51:15.785
+{"pid":"CO_CHECKOPTION_INFO","type":1,"check":1}	48	
+13:51:15.786
+104|{"seq":63,"tDiff":0,"data":{"pid":"CO_SELECT_INFO","seat":4,"btn":1024,"bet":0,"raise":0,"account":308}}	108	
+13:51:15.787
+105|{"seq":64,"tDiff":0,"data":{"pid":"CO_CHIPTABLE_INFO","seat":0,"potCount":0,"curPot":[70],"curRake":[3]}}	109	
+13:51:15.787
+68|{"seq":65,"tDiff":0,"data":{"tableState":16,"pid":"CO_TABLE_STATE"}}	71	
+13:51:15.787
+71|{"seq":66,"tDiff":0,"data":{"bcard":[33,23,45],"pid":"CO_BCARD3_INFO"}}	74	
+13:51:15.787
+62|{"seq":67,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	65	
+13:51:15.788
+64|{"seq":68,"tDiff":0,"data":{"seat":6,"pid":"CO_CURRENT_PLAYER"}}	67	
+13:51:15.788
+112|{"seq":69,"tDiff":1234,"data":{"pid":"PLAY_SEAT_INFO","type":0,"seat":4,"state":32,"account":308,"nickName":""}}	116	
+13:51:16.930
+75|{"seq":70,"tDiff":0,"data":{"amountToPost":10,"pid":"CO_PRESELECT_BLINDS"}}	78	
+13:51:17.016
+{"pid":"CO_CHECKOPTION_INFO","type":1,"check":1}	48	
+13:51:17.017
+106|{"seq":71,"tDiff":3953,"data":{"pid":"CO_SELECT_INFO","seat":6,"btn":64,"bet":0,"raise":0,"account":1308}}	110	
+13:51:20.883
+62|{"seq":72,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	65	
+13:51:20.970
+64|{"seq":73,"tDiff":0,"data":{"seat":1,"pid":"CO_CURRENT_PLAYER"}}	67	
+13:51:20.971
+{"pid":"PING","uuid":"b08855fb-01fa-4262-b579-b127f08986c6"}	60	
+13:51:22.188
+94|{"seq":74,"tDiff":1469,"data":{"pid": "PONG", "uuid": "b08855fb-01fa-4262-b579-b127f08986c6"}}	97	
+13:51:22.351
+107|{"seq":75,"tDiff":4000,"data":{"pid":"CO_SELECT_INFO","seat":1,"btn":128,"bet":10,"raise":0,"account":132}}	111	
+13:51:26.351
+94|{"seq":74,"tDiff":1469,"data":{"pid": "PONG", "uuid": "b08855fb-01fa-4262-b579-b127f08986c6"}}	97	
+13:51:22.351
+107|{"seq":75,"tDiff":4000,"data":{"pid":"CO_SELECT_INFO","seat":1,"btn":128,"bet":10,"raise":0,"account":132}}	111	
+13:51:26.351
+62|{"seq":76,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	65	
+13:51:26.438
+65|{"seq":77,"tDiff":15,"data":{"seat":6,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:51:26.439
+108|{"seq":78,"tDiff":2047,"data":{"pid":"CO_SELECT_INFO","seat":6,"btn":256,"bet":10,"raise":0,"account":1298}}	112	
+13:51:28.414
+105|{"seq":79,"tDiff":0,"data":{"pid":"CO_CHIPTABLE_INFO","seat":0,"potCount":0,"curPot":[90],"curRake":[4]}}	109	
+13:51:28.501
+68|{"seq":80,"tDiff":0,"data":{"tableState":32,"pid":"CO_TABLE_STATE"}}	71	
+13:51:28.502
+70|{"seq":81,"tDiff":0,"data":{"pos":4,"card":26,"pid":"CO_BCARD1_INFO"}}	73	
+13:51:28.502
+62|{"seq":82,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	65	
+13:51:28.502
+64|{"seq":83,"tDiff":0,"data":{"seat":6,"pid":"CO_CURRENT_PLAYER"}}	67	
+13:51:28.502
+108|{"seq":84,"tDiff":5406,"data":{"pid":"CO_SELECT_INFO","seat":6,"btn":128,"bet":53,"raise":0,"account":1245}}	112	
+13:51:33.820
+62|{"seq":85,"tDiff":1,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	65	
+13:51:33.908
+64|{"seq":86,"tDiff":0,"data":{"seat":1,"pid":"CO_CURRENT_PLAYER"}}	67	
+13:51:33.909
+106|{"seq":87,"tDiff":4828,"data":{"pid":"CO_SELECT_INFO","seat":1,"btn":256,"bet":53,"raise":0,"account":79}}	110	
+13:51:38.648
+106|{"seq":88,"tDiff":0,"data":{"pid":"CO_CHIPTABLE_INFO","seat":0,"potCount":0,"curPot":[196],"curRake":[9]}}	110	
+13:51:38.736
+68|{"seq":89,"tDiff":0,"data":{"tableState":64,"pid":"CO_TABLE_STATE"}}	71	
+13:51:38.737
+70|{"seq":90,"tDiff":0,"data":{"pos":5,"card":47,"pid":"CO_BCARD1_INFO"}}	73	
+13:51:38.737
+62|{"seq":91,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	65	
+13:51:38.737
+64|{"seq":92,"tDiff":0,"data":{"seat":6,"pid":"CO_CURRENT_PLAYER"}}	67	
+13:51:38.738
+108|{"seq":93,"tDiff":4234,"data":{"pid":"CO_SELECT_INFO","seat":6,"btn":128,"bet":94,"raise":0,"account":1151}}	112	
+13:51:42.883
+62|{"seq":94,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	65	
+13:51:42.974
+64|{"seq":95,"tDiff":0,"data":{"seat":1,"pid":"CO_CURRENT_PLAYER"}}	67	
+13:51:42.974
+106|{"seq":96,"tDiff":1485,"data":{"pid":"CO_SELECT_INFO","seat":1,"btn":2048,"bet":79,"raise":0,"account":0}}	110	
+13:51:44.368
+122|{"seq":97,"tDiff":0,"data":{"pid":"CO_CHIPTABLE_INFO","returnBet":15,"seat":6,"potCount":1,"curPot":[354],"curRake":[17]}}	126	
+13:51:44.454
+71|{"seq":98,"tDiff":0,"data":{"tableState":32768,"pid":"CO_TABLE_STATE"}}	74	
+13:51:44.455
+75|{"seq":99,"tDiff":0,"data":{"type":8,"data":0,"dwData":4,"pid":"SYS_INFO"}}	78	
+13:51:44.455
+84|{"seq":100,"tDiff":0,"data":{"pid":"CO_PCARD_INFO","type":0,"seat":6,"card":[22,0]}}	87	
+13:51:44.455
+71|{"seq":101,"tDiff":0,"data":{"seat":6,"btn":8192,"pid":"CO_SHOW_INFO"}}	74	
+13:51:44.455
+84|{"seq":102,"tDiff":0,"data":{"pid":"CO_PCARD_INFO","type":0,"seat":1,"card":[48,8]}}	87	
+13:51:44.456
+71|{"seq":103,"tDiff":0,"data":{"seat":1,"btn":8192,"pid":"CO_SHOW_INFO"}}	74	
+13:51:44.456
+72|{"seq":104,"tDiff":0,"data":{"tableState":65536,"pid":"CO_TABLE_STATE"}}	75	
+13:51:44.456
+143|{"seq":105,"tDiff":78,"data":{"pid":"CO_RESULT_INFO","account":[168,1295,1000,308,998,1335,0,0,0],"handHi1":[3,0,6,2,4],"handHi6":[3,0,6,2,4]}}	147	
+13:51:44.456
+170|{"seq":106,"tDiff":0,"data":{"pid":"CO_POT_INFO","kicker":0,"kickerCard":[0,0,0,0,0,0,0,0,0],"potNo":0,"returnHi":[168,0,0,0,0,169,0,0,0],"returnLo":[0,0,0,0,0,0,0,0,0]}}	174	
+13:51:44.456
+58|{"seq":107,"tDiff":78,"data":{"pid":"PLAY_STAGE_END_REQ"}}	61	
+13:51:44.542
+{"pid":"PLAY_STAGE_END_RES","stageNo":"4903352383"}	51	
+13:51:46.225
+80|{"seq":108,"tDiff":2765,"data":{"pid":"PLAY_STAGE_INFO","stageNo":"4903352383"}}	83	
+13:51:47.289
+54|{"seq":109,"tDiff":0,"data":{"pid":"PLAY_CLEAR_INFO"}}	57	
+13:51:47.291
+62|{"seq":110,"tDiff":0,"data":{"seat":2,"pid":"CO_DEALER_SEAT"}}	65	
+13:51:47.294
+77|{"seq":111,"tDiff":0,"data":{"pid":"PLAY_STAGE_INFO","stageNo":"4903352567"}}	80	
+13:51:47.295
+68|{"seq":112,"tDiff":0,"data":{"tableState":2,"pid":"CO_TABLE_STATE"}}	71	
+13:51:47.295
+62|{"seq":113,"tDiff":0,"data":{"seat":3,"pid":"CO_DEALER_SEAT"}}	65	
+13:51:47.296
+62|{"seq":114,"tDiff":0,"data":{"seat":3,"pid":"CO_DEALER_SEAT"}}	65	
+13:51:47.297
+68|{"seq":115,"tDiff":0,"data":{"tableState":4,"pid":"CO_TABLE_STATE"}}	71	
+13:51:47.298
+115|{"seq":116,"tDiff":0,"data":{"pid":"CO_BLIND_INFO","seat":4,"account":303,"baseStakes":0,"btn":2,"bet":5,"dead":0}}	119	
+13:51:47.298
+116|{"seq":117,"tDiff":0,"data":{"pid":"CO_BLIND_INFO","seat":5,"account":988,"baseStakes":0,"btn":4,"bet":10,"dead":0}}	120	
+13:51:47.299
+68|{"seq":118,"tDiff":0,"data":{"tableState":8,"pid":"CO_TABLE_STATE"}}	71	
+13:51:47.300
+166|{"seq":119,"tDiff":1,"data":{"pid":"CO_CARDTABLE_INFO","seat1":[32896,32896],"seat2":[32896,32896],"seat4":[32896,32896],"seat5":[32896,32896],"seat6":[32896,32896]}}	170	
+13:51:47.301
+63|{"seq":120,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:51:47.381
+65|{"seq":121,"tDiff":0,"data":{"seat":6,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:51:47.381
+110|{"seq":122,"tDiff":3390,"data":{"pid":"CO_SELECT_INFO","seat":6,"btn":512,"bet":10,"raise":30,"account":1305}}	114	
+13:51:50.679
+63|{"seq":123,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:51:50.767
+65|{"seq":124,"tDiff":0,"data":{"seat":1,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:51:50.768
+{"pid":"PING","uuid":"e6c84be2-d04d-44ce-a495-e735af57ee2f"}	60	
+13:51:52.189
+95|{"seq":125,"tDiff":1673,"data":{"pid": "PONG", "uuid": "e6c84be2-d04d-44ce-a495-e735af57ee2f"}}	98	
+13:51:52.352
+108|{"seq":126,"tDiff":5608,"data":{"pid":"CO_SELECT_INFO","seat":1,"btn":1024,"bet":0,"raise":0,"account":168}}	112	
+13:51:57.961
+63|{"seq":127,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:51:58.048
+65|{"seq":128,"tDiff":0,"data":{"seat":2,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:51:58.048
+109|{"seq":129,"tDiff":4313,"data":{"pid":"CO_SELECT_INFO","seat":2,"btn":1024,"bet":0,"raise":0,"account":1295}}	113	
+13:52:02.274
+63|{"seq":130,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:52:02.362
+62|{"seq":113,"tDiff":0,"data":{"seat":3,"pid":"CO_DEALER_SEAT"}}	65	
+13:51:47.296
+62|{"seq":114,"tDiff":0,"data":{"seat":3,"pid":"CO_DEALER_SEAT"}}	65	
+13:51:47.297
+68|{"seq":115,"tDiff":0,"data":{"tableState":4,"pid":"CO_TABLE_STATE"}}	71	
+13:51:47.298
+115|{"seq":116,"tDiff":0,"data":{"pid":"CO_BLIND_INFO","seat":4,"account":303,"baseStakes":0,"btn":2,"bet":5,"dead":0}}	119	
+13:51:47.298
+116|{"seq":117,"tDiff":0,"data":{"pid":"CO_BLIND_INFO","seat":5,"account":988,"baseStakes":0,"btn":4,"bet":10,"dead":0}}	120	
+13:51:47.299
+68|{"seq":118,"tDiff":0,"data":{"tableState":8,"pid":"CO_TABLE_STATE"}}	71	
+13:51:47.300
+166|{"seq":119,"tDiff":1,"data":{"pid":"CO_CARDTABLE_INFO","seat1":[32896,32896],"seat2":[32896,32896],"seat4":[32896,32896],"seat5":[32896,32896],"seat6":[32896,32896]}}	170	
+13:51:47.301
+63|{"seq":120,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:51:47.381
+65|{"seq":121,"tDiff":0,"data":{"seat":6,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:51:47.381
+110|{"seq":122,"tDiff":3390,"data":{"pid":"CO_SELECT_INFO","seat":6,"btn":512,"bet":10,"raise":30,"account":1305}}	114	
+13:51:50.679
+63|{"seq":123,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:51:50.767
+65|{"seq":124,"tDiff":0,"data":{"seat":1,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:51:50.768
+{"pid":"PING","uuid":"e6c84be2-d04d-44ce-a495-e735af57ee2f"}	60	
+13:51:52.189
+95|{"seq":125,"tDiff":1673,"data":{"pid": "PONG", "uuid": "e6c84be2-d04d-44ce-a495-e735af57ee2f"}}	98	
+13:51:52.352
+108|{"seq":126,"tDiff":5608,"data":{"pid":"CO_SELECT_INFO","seat":1,"btn":1024,"bet":0,"raise":0,"account":168}}	112	
+13:51:57.961
+63|{"seq":127,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:51:58.048
+65|{"seq":128,"tDiff":0,"data":{"seat":2,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:51:58.048
+109|{"seq":129,"tDiff":4313,"data":{"pid":"CO_SELECT_INFO","seat":2,"btn":1024,"bet":0,"raise":0,"account":1295}}	113	
+13:52:02.274
+63|{"seq":130,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:52:02.362
+65|{"seq":131,"tDiff":0,"data":{"seat":4,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:52:02.364
+108|{"seq":132,"tDiff":1453,"data":{"pid":"CO_SELECT_INFO","seat":4,"btn":1024,"bet":0,"raise":0,"account":303}}	112	
+13:52:03.726
+63|{"seq":133,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:52:03.812
+65|{"seq":134,"tDiff":0,"data":{"seat":5,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:52:03.813
+108|{"seq":135,"tDiff":3109,"data":{"pid":"CO_SELECT_INFO","seat":5,"btn":256,"bet":20,"raise":0,"account":968}}	112	
+13:52:06.835
+106|{"seq":136,"tDiff":0,"data":{"pid":"CO_CHIPTABLE_INFO","seat":0,"potCount":0,"curPot":[65],"curRake":[3]}}	110	
+13:52:06.923
+69|{"seq":137,"tDiff":0,"data":{"tableState":16,"pid":"CO_TABLE_STATE"}}	72	
+13:52:06.924
+72|{"seq":138,"tDiff":0,"data":{"bcard":[27,20,43],"pid":"CO_BCARD3_INFO"}}	75	
+13:52:06.924
+63|{"seq":139,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:52:06.924
+65|{"seq":140,"tDiff":0,"data":{"seat":5,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:52:06.924
+108|{"seq":141,"tDiff":5984,"data":{"pid":"CO_SELECT_INFO","seat":5,"btn":128,"bet":20,"raise":0,"account":948}}	112	
+13:52:12.820
+63|{"seq":142,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:52:12.907
+65|{"seq":143,"tDiff":0,"data":{"seat":6,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:52:12.909
+110|{"seq":144,"tDiff":7673,"data":{"pid":"CO_SELECT_INFO","seat":6,"btn":512,"bet":20,"raise":81,"account":1224}}	114	
+13:52:20.495
+63|{"seq":145,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:52:20.581
+65|{"seq":146,"tDiff":0,"data":{"seat":5,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:52:20.582
+{"pid":"PING","uuid":"2506abe0-3532-4342-a790-bf6aeb488dfa"}	60	
+13:52:22.190
+95|{"seq":147,"tDiff":1861,"data":{"pid": "PONG", "uuid": "2506abe0-3532-4342-a790-bf6aeb488dfa"}}	98	
+13:52:22.353
+107|{"seq":148,"tDiff":904,"data":{"pid":"CO_SELECT_INFO","seat":5,"btn":256,"bet":61,"raise":0,"account":887}}	111	
+13:52:23.258
+108|{"seq":149,"tDiff":0,"data":{"pid":"CO_CHIPTABLE_INFO","seat":0,"potCount":0,"curPot":[227],"curRake":[11]}}	112	
+13:52:23.346
+69|{"seq":150,"tDiff":0,"data":{"tableState":32,"pid":"CO_TABLE_STATE"}}	72	
+13:52:23.353
+71|{"seq":151,"tDiff":0,"data":{"pos":4,"card":36,"pid":"CO_BCARD1_INFO"}}	74	
+13:52:23.353
+63|{"seq":152,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:52:23.353
+65|{"seq":153,"tDiff":0,"data":{"seat":5,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:52:23.353
+106|{"seq":154,"tDiff":3125,"data":{"pid":"CO_SELECT_INFO","seat":5,"btn":64,"bet":0,"raise":0,"account":887}}	110	
+13:52:26.384
+63|{"seq":155,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:52:26.469
+65|{"seq":156,"tDiff":0,"data":{"seat":6,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:52:26.470
+110|{"seq":157,"tDiff":4328,"data":{"pid":"CO_SELECT_INFO","seat":6,"btn":128,"bet":152,"raise":0,"account":1072}}	114	
+13:52:30.711
+63|{"seq":158,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:52:30.798
+65|{"seq":159,"tDiff":0,"data":{"seat":5,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:52:30.799
+108|{"seq":160,"tDiff":6125,"data":{"pid":"CO_SELECT_INFO","seat":5,"btn":1024,"bet":0,"raise":0,"account":887}}	112	
+13:52:36.837
+124|{"seq":161,"tDiff":0,"data":{"pid":"CO_CHIPTABLE_INFO","returnBet":152,"seat":6,"potCount":0,"curPot":[227],"curRake":[11]}}	128	
+13:52:36.925
+72|{"seq":162,"tDiff":0,"data":{"tableState":32768,"pid":"CO_TABLE_STATE"}}	75	
+13:52:36.931
+62|{"seq":163,"tDiff":0,"data":{"time":2,"pid":"PLAY_TIME_INFO"}}	65	
+13:52:36.931
+65|{"seq":164,"tDiff":0,"data":{"seat":6,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:52:36.932
+74|{"seq":165,"tDiff":735,"data":{"seat":6,"btn":32768,"pid":"CO_SHOW_INFO"}}	77	
+13:52:37.569
+72|{"seq":166,"tDiff":0,"data":{"tableState":65536,"pid":"CO_TABLE_STATE"}}	75	
+13:52:37.659
+99|{"seq":167,"tDiff":62,"data":{"pid":"CO_RESULT_INFO","account":[168,1295,1000,303,887,1440,0,0,0]}}	102	
+13:52:37.660
+168|{"seq":168,"tDiff":0,"data":{"pid":"CO_POT_INFO","kicker":0,"kickerCard":[0,0,0,0,0,0,0,0,0],"potNo":0,"returnHi":[0,0,0,0,0,216,0,0,0],"returnLo":[0,0,0,0,0,0,0,0,0]}}	172	
+13:52:37.660
+74|{"seq":169,"tDiff":0,"data":{"pos":5,"card":5,"pid":"CO_RABBITCARD_INFO"}}	77	
+13:52:37.660
+tDiff":0,"data":{"pos":5,"card":5,"pid":"CO_RABBITCARD_INFO"}}	77	
+13:52:37.660
+58|{"seq":170,"tDiff":15,"data":{"pid":"PLAY_STAGE_END_REQ"}}	61	
+13:52:37.660
+80|{"seq":171,"tDiff":2641,"data":{"pid":"PLAY_STAGE_INFO","stageNo":"4903352567"}}	83	
+13:52:40.292
+54|{"seq":172,"tDiff":0,"data":{"pid":"PLAY_CLEAR_INFO"}}	57	
+13:52:40.293
+62|{"seq":173,"tDiff":0,"data":{"seat":3,"pid":"CO_DEALER_SEAT"}}	65	
+13:52:40.293
+77|{"seq":174,"tDiff":0,"data":{"pid":"PLAY_STAGE_INFO","stageNo":"4903352729"}}	80	
+13:52:40.293
+68|{"seq":175,"tDiff":0,"data":{"tableState":2,"pid":"CO_TABLE_STATE"}}	71	
+13:52:40.294
+62|{"seq":176,"tDiff":1,"data":{"seat":4,"pid":"CO_DEALER_SEAT"}}	65	
+13:52:40.294
+62|{"seq":177,"tDiff":0,"data":{"seat":4,"pid":"CO_DEALER_SEAT"}}	65	
+13:52:40.294
+68|{"seq":178,"tDiff":0,"data":{"tableState":4,"pid":"CO_TABLE_STATE"}}	71	
+13:52:40.295
+115|{"seq":179,"tDiff":0,"data":{"pid":"CO_BLIND_INFO","seat":5,"account":882,"baseStakes":0,"btn":2,"bet":5,"dead":0}}	119	
+13:52:40.295
+117|{"seq":180,"tDiff":0,"data":{"pid":"CO_BLIND_INFO","seat":6,"account":1430,"baseStakes":0,"btn":4,"bet":10,"dead":0}}	121	
+13:52:40.295
+68|{"seq":181,"tDiff":0,"data":{"tableState":8,"pid":"CO_TABLE_STATE"}}	71	
+13:52:40.295
+166|{"seq":182,"tDiff":0,"data":{"pid":"CO_CARDTABLE_INFO","seat1":[32896,32896],"seat2":[32896,32896],"seat4":[32896,32896],"seat5":[32896,32896],"seat6":[32896,32896]}}	170	
+13:52:40.296
+63|{"seq":183,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:52:40.377
+65|{"seq":184,"tDiff":0,"data":{"seat":1,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:52:40.377
+{"pid":"PLAY_STAGE_END_RES","stageNo":"4903352567"}	51	
+13:52:40.684
+108|{"seq":185,"tDiff":8452,"data":{"pid":"CO_SELECT_INFO","seat":1,"btn":256,"bet":10,"raise":0,"account":158}}	112	
+13:52:48.741
+63|{"seq":186,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:52:48.828
+65|{"seq":187,"tDiff":0,"data":{"seat":2,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:52:48.829
+108|{"seq":188,"tDiff":922,"data":{"pid":"CO_SELECT_INFO","seat":2,"btn":1024,"bet":0,"raise":0,"account":1295}}	112	
+13:52:49.664
+63|{"seq":189,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:52:49.752
+65|{"seq":190,"tDiff":0,"data":{"seat":4,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:52:49.752
+108|{"seq":191,"tDiff":2234,"data":{"pid":"CO_SELECT_INFO","seat":4,"btn":256,"bet":10,"raise":0,"account":293}}	112	
+13:52:51.900
+63|{"seq":192,"tDiff":1,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:52:51.985
+65|{"seq":193,"tDiff":0,"data":{"seat":5,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:52:51.986
+{"pid":"PING","uuid":"d52be4f0-81a7-4d75-b7bf-783bcf3e64cf"}	60	
+13:52:52.192
+94|{"seq":194,"tDiff":457,"data":{"pid": "PONG", "uuid": "d52be4f0-81a7-4d75-b7bf-783bcf3e64cf"}}	97	
+13:52:52.355
+107|{"seq":195,"tDiff":2105,"data":{"pid":"CO_SELECT_INFO","seat":5,"btn":256,"bet":5,"raise":0,"account":877}}	111	
+13:52:54.461
+63|{"seq":196,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:52:54.548
+65|{"seq":197,"tDiff":0,"data":{"seat":6,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:52:54.548
+106|{"seq":198,"tDiff":625,"data":{"pid":"CO_SELECT_INFO","seat":6,"btn":64,"bet":0,"raise":0,"account":1430}}	110	
+13:52:55.086
+106|{"seq":199,"tDiff":0,"data":{"pid":"CO_CHIPTABLE_INFO","seat":0,"potCount":0,"curPot":[40],"curRake":[2]}}	110	
+13:52:55.175
+69|{"seq":200,"tDiff":0,"data":{"tableState":16,"pid":"CO_TABLE_STATE"}}	72	
+13:52:55.184
+71|{"seq":201,"tDiff":0,"data":{"bcard":[37,20,6],"pid":"CO_BCARD3_INFO"}}	74	
+13:52:55.185
+63|{"seq":202,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:52:55.185
+65|{"seq":203,"tDiff":0,"data":{"seat":5,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:52:55.185
+106|{"seq":204,"tDiff":3859,"data":{"pid":"CO_SELECT_INFO","seat":5,"btn":64,"bet":0,"raise":0,"account":877}}	110	
+13:52:58.946
+63|{"seq":205,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:52:59.031
+65|{"seq":206,"tDiff":0,"data":{"seat":6,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:52:59.032
+107|{"seq":207,"tDiff":2032,"data":{"pid":"CO_SELECT_INFO","seat":6,"btn":64,"bet":0,"raise":0,"account":1430}}	111	
+13:53:00.984
+63|{"seq":208,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:53:01.063
+65|{"seq":209,"tDiff":0,"data":{"seat":1,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:53:01.065
+106|{"seq":210,"tDiff":3125,"data":{"pid":"CO_SELECT_INFO","seat":1,"btn":64,"bet":0,"raise":0,"account":158}}	110	
+13:53:04.102
+63|{"seq":211,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:53:04.189
+65|{"seq":212,"tDiff":0,"data":{"seat":4,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:53:04.189
+106|{"seq":213,"tDiff":1750,"data":{"pid":"CO_SELECT_INFO","seat":4,"btn":64,"bet":0,"raise":0,"account":293}}	110	
+13:53:05.852
+106|{"seq":214,"tDiff":0,"data":{"pid":"CO_CHIPTABLE_INFO","seat":0,"potCount":0,"curPot":[40],"curRake":[2]}}	110	
+13:53:05.941
+69|{"seq":215,"tDiff":0,"data":{"tableState":32,"pid":"CO_TABLE_STATE"}}	72	
+13:53:05.943
+71|{"seq":216,"tDiff":0,"data":{"pos":4,"card":39,"pid":"CO_BCARD1_INFO"}}	74	
+13:53:05.943
+63|{"seq":217,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:53:05.943
+65|{"seq":218,"tDiff":0,"data":{"seat":5,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:53:05.943
+106|{"seq":219,"tDiff":3125,"data":{"pid":"CO_SELECT_INFO","seat":5,"btn":64,"bet":0,"raise":0,"account":877}}	110	
+13:53:08.976
+63|{"seq":220,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}
+106|{"seq":219,"tDiff":3125,"data":{"pid":"CO_SELECT_INFO","seat":5,"btn":64,"bet":0,"raise":0,"account":877}}	110	
+13:53:08.976
+63|{"seq":220,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:53:09.064
+65|{"seq":221,"tDiff":0,"data":{"seat":6,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:53:09.064
+107|{"seq":222,"tDiff":1500,"data":{"pid":"CO_SELECT_INFO","seat":6,"btn":64,"bet":0,"raise":0,"account":1430}}	111	
+13:53:10.476
+63|{"seq":223,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:53:10.563
+65|{"seq":224,"tDiff":0,"data":{"seat":1,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:53:10.564
+106|{"seq":225,"tDiff":3469,"data":{"pid":"CO_SELECT_INFO","seat":1,"btn":64,"bet":0,"raise":0,"account":158}}	110	
+13:53:13.945
+63|{"seq":226,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:53:14.032
+65|{"seq":227,"tDiff":0,"data":{"seat":4,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:53:14.032
+106|{"seq":228,"tDiff":3359,"data":{"pid":"CO_SELECT_INFO","seat":4,"btn":64,"bet":0,"raise":0,"account":293}}	110	
+13:53:17.305
+106|{"seq":229,"tDiff":0,"data":{"pid":"CO_CHIPTABLE_INFO","seat":0,"potCount":0,"curPot":[40],"curRake":[2]}}	110	
+13:53:17.394
+69|{"seq":230,"tDiff":0,"data":{"tableState":64,"pid":"CO_TABLE_STATE"}}	72	
+13:53:17.399
+71|{"seq":231,"tDiff":0,"data":{"pos":5,"card":18,"pid":"CO_BCARD1_INFO"}}	74	
+13:53:17.400
+63|{"seq":232,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:53:17.400
+65|{"seq":233,"tDiff":0,"data":{"seat":5,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:53:17.401
+{"pid":"PING","uuid":"1c7bff67-1602-4ff7-82dd-6fff62f3a903"}	60	
+13:53:22.194
+95|{"seq":234,"tDiff":5053,"data":{"pid": "PONG", "uuid": "1c7bff67-1602-4ff7-82dd-6fff62f3a903"}}	98	
+13:53:22.357
+107|{"seq":235,"tDiff":900,"data":{"pid":"CO_SELECT_INFO","seat":5,"btn":128,"bet":10,"raise":0,"account":867}}	111	
+13:53:23.259
+63|{"seq":236,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:53:23.344
+65|{"seq":237,"tDiff":0,"data":{"seat":6,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:53:23.344
+110|{"seq":238,"tDiff":4687,"data":{"pid":"CO_SELECT_INFO","seat":6,"btn":512,"bet":10,"raise":84,"account":1346}}	114	
+13:53:27.944
+63|{"seq":239,"tDiff":1,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:53:28.033
+65|{"seq":240,"tDiff":0,"data":{"seat":1,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:53:28.033
+107|{"seq":241,"tDiff":562,"data":{"pid":"CO_SELECT_INFO","seat":1,"btn":1024,"bet":0,"raise":0,"account":158}}	111	
+13:53:28.507
+63|{"seq":242,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:53:28.596
+65|{"seq":243,"tDiff":0,"data":{"seat":4,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:53:28.597
+109|{"seq":244,"tDiff":1922,"data":{"pid":"CO_SELECT_INFO","seat":4,"btn":4096,"bet":84,"raise":293,"account":0}}	113	
+13:53:30.428
+63|{"seq":245,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:53:30.516
+65|{"seq":246,"tDiff":0,"data":{"seat":5,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:53:30.517
+108|{"seq":247,"tDiff":7297,"data":{"pid":"CO_SELECT_INFO","seat":5,"btn":1024,"bet":0,"raise":0,"account":867}}	112	
+13:53:37.726
+63|{"seq":248,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:53:37.813
+65|{"seq":249,"tDiff":0,"data":{"seat":6,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:53:37.814
+110|{"seq":250,"tDiff":6375,"data":{"pid":"CO_SELECT_INFO","seat":6,"btn":256,"bet":209,"raise":0,"account":1137}}	114	
+13:53:44.106
+108|{"seq":251,"tDiff":0,"data":{"pid":"CO_CHIPTABLE_INFO","seat":0,"potCount":1,"curPot":[636],"curRake":[31]}}	112	
+13:53:44.191
+72|{"seq":252,"tDiff":0,"data":{"tableState":32768,"pid":"CO_TABLE_STATE"}}	75	
+13:53:44.191
+76|{"seq":253,"tDiff":0,"data":{"type":8,"data":0,"dwData":4,"pid":"SYS_INFO"}}	79	
+13:53:44.191
+84|{"seq":254,"tDiff":0,"data":{"pid":"CO_PCARD_INFO","type":0,"seat":4,"card":[4,42]}}	87	
+13:53:44.192
+71|{"seq":255,"tDiff":1,"data":{"seat":4,"btn":8192,"pid":"CO_SHOW_INFO"}}	74	
+13:53:44.192
+62|{"seq":256,"tDiff":0,"data":{"time":2,"pid":"PLAY_TIME_INFO"}}	65	
+13:53:44.192
+65|{"seq":257,"tDiff":0,"data":{"seat":6,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:53:44.192
+75|{"seq":258,"tDiff":1061,"data":{"seat":6,"btn":16384,"pid":"CO_SHOW_INFO"}}	78	
+13:53:45.163
+72|{"seq":259,"tDiff":0,"data":{"tableState":65536,"pid":"CO_TABLE_STATE"}}	75	
+13:53:45.254
+121|{"seq":260,"tDiff":47,"data":{"pid":"CO_RESULT_INFO","account":[158,1295,1000,605,867,1137,0,0,0],"handHi4":[3,4,6,0,1]}}	125	
+13:53:45.255
+168|{"seq":261,"tDiff":0,"data":{"pid":"CO_POT_INFO","kicker":0,"kickerCard":[0,0,0,0,0,0,0,0,0],"potNo":0,"returnHi":[0,0,0,605,0,0,0,0,0],"returnLo":[0,0,0,0,0,0,0,0,0]}}	172	
+13:53:45.255
+58|{"seq":262,"tDiff":15,"data":{"pid":"PLAY_STAGE_END_REQ"}}	61	
+13:53:45.255
+{"pid":"PLAY_STAGE_END_RES","stageNo":"4903352729"}	51	
+13:53:46.247
+80|{"seq":263,"tDiff":2063,"data":{"pid":"PLAY_STAGE_INFO","stageNo":"4903352729"}}	83	
+13:53:47.290
+54|{"seq":264,"tDiff":1,"data":{"pid":"PLAY_CLEAR_INFO"}}	57	
+13:53:47.294
+62|{"seq":265,"tDiff":0,"data":{"seat":4,"pid":"CO_DEALER_SEAT"}}	65	
+13:53:47.296
+77|{"seq":266,"tDiff":0,"data":{"pid":"PLAY_STAGE_INFO","stageNo":"4903352955"}}	80	
+13:53:47.296
+68|{"seq":267,"tDiff":0,"data":{"tableState":2,"pid":"CO_TABLE_STATE"}}	71	
+13:53:47.296
+62|{"seq":268,"tDiff":0,"data":{"seat":5,"pid":"CO_DEALER_SEAT"}}	65	
+13:53:47.297
+62|{"seq":269,"tDiff":0,"data":{"seat":5,"pid":"CO_DEALER_SEAT"}}	65	
+13:53:47.297
+68|{"seq":270,"tDiff":0,"data":{"tableState":4,"pid":"CO_TABLE_STATE"}}	71	
+13:53:47.297
+116|{"seq":271,"tDiff":0,"data":{"pid":"CO_BLIND_INFO","seat":6,"account":1132,"baseStakes":0,"btn":2,"bet":5,"dead":0}}	120	
+13:53:47.298
+116|{"seq":272,"tDiff":0,"data":{"pid":"CO_BLIND_INFO","seat":1,"account":148,"baseStakes":0,"btn":4,"bet":10,"dead":0}}	120	
+13:53:47.299
+68|{"seq":273,"tDiff":0,"data":{"tableState":8,"pid":"CO_TABLE_STATE"}}	71	
+13:53:47.299
+166|{"seq":274,"tDiff":0,"data":{"pid":"CO_CARDTABLE_INFO","seat1":[32896,32896],"seat2":[32896,32896],"seat4":[32896,32896],"seat5":[32896,32896],"seat6":[32896,32896]}}	170	
+13:53:47.300
+63|{"seq":275,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}
+at":2,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:53:47.378
+{"pid":"PING","uuid":"438f0f1e-6088-471a-ae25-7145856f5b6e"}	60	
+13:53:52.195
+95|{"seq":277,"tDiff":5069,"data":{"pid": "PONG", "uuid": "438f0f1e-6088-471a-ae25-7145856f5b6e"}}	98	
+13:53:52.358
+108|{"seq":278,"tDiff":477,"data":{"pid":"CO_SELECT_INFO","seat":2,"btn":1024,"bet":0,"raise":0,"account":1295}}	112	
+13:53:52.836
+63|{"seq":279,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:53:52.923
+65|{"seq":280,"tDiff":0,"data":{"seat":4,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:53:52.924
+109|{"seq":281,"tDiff":10610,"data":{"pid":"CO_SELECT_INFO","seat":4,"btn":1024,"bet":0,"raise":0,"account":605}}	113	
+13:54:03.446
+63|{"seq":282,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:54:03.531
+65|{"seq":283,"tDiff":0,"data":{"seat":5,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:54:03.532
+114|{"seq":284,"tDiff":15359,"data":{"pid":"PLAY_SEAT_INFO","type":1,"seat":5,"state":32,"account":867,"nickName":""}}	118	
+13:54:18.806
+76|{"seq":285,"tDiff":0,"data":{"amountToPost":10,"pid":"CO_PRESELECT_BLINDS"}}	79	
+13:54:18.892
+{"pid":"CO_CHECKOPTION_INFO","type":1,"check":1}	48	
+13:54:18.893
+105|{"seq":286,"tDiff":0,"data":{"pid":"CO_SELECT_INFO","seat":5,"btn":1024,"bet":0,"raise":0,"account":867}}	109	
+13:54:18.894
+63|{"seq":287,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:54:18.894
+65|{"seq":288,"tDiff":0,"data":{"seat":6,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:54:18.895
+109|{"seq":289,"tDiff":1687,"data":{"pid":"CO_SELECT_INFO","seat":6,"btn":512,"bet":5,"raise":25,"account":1107}}	113	
+13:54:20.493
+63|{"seq":290,"tDiff":0,"data":{"time":15,"pid":"PLAY_TIME_INFO"}}	66	
+13:54:20.580
+65|{"seq":291,"tDiff":0,"data":{"seat":1,"pid":"CO_CURRENT_PLAYER"}}	68	
+13:54:20.580
+112|{"seq":292,"tDiff":454,"data":{"pid":"PLAY_SEAT_INFO","type":0,"seat":5,"state":32,"account":867,"nickName":""}}	116	
+13:54:20.965
+76|{"seq":293,"tDiff":0,"data":{"amountToPost":10,"pid":"CO_PRESELECT_BLINDS"}}	79	
+13:54:21.032
+{"pid":"CO_CHECKOPTION_INFO","type":1,"check":1}	48	
+13:54:21.033
+{"pid":"PING","uuid":"7f65425c-ac33-47f2-885d-668d82f44f35"}	60	
+13:54:22.195
+95|{"seq":294,"tDiff":1414,"data":{"pid": "PONG", "uuid": "7f65425c-ac33-47f2-885d-668d82f44f35"}}	98	
+13:54:22.360
+{"pid":"CONNECT_CLOSE"}

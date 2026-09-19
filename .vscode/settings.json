@@ -1,0 +1,4 @@
+{
+  // .env here is Vite build config, not terminal env — don't inject it.
+  "python.terminal.useEnvFile": false
+}

@@ -1,0 +1,16 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+@theme {
+  --color-felt-50: #f2f8f4;
+  --color-felt-100: #dceee3;
+  --color-felt-200: #b9ddc9;
+  --color-felt-300: #8cc4a7;
+  --color-felt-400: #5aa681;
+  --color-felt-500: #3a8a64;
+  --color-felt-600: #296e4f;
+  --color-felt-700: #215841;
+  --color-felt-800: #1d4735;
+  --color-felt-900: #193b2d;
+  --color-felt-950: #0c211a;
+}

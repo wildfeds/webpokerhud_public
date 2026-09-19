@@ -1,0 +1,47 @@
+[BovadaHUD] Joined {gid: 'Joined'}
+content_script.js:1 [BovadaHUD] CONNECT_LOGIN_INFO {pid: 'CONNECT_LOGIN_INFO', nickName: '560201380440500'}
+content_script.js:1 [BovadaHUD] PLAY_TABLE_NUMBER {tableNo: 37388866, pid: 'PLAY_TABLE_NUMBER'}
+content_script.js:1 [BovadaHUD] PLAY_INIT_OPTION {pid: 'PLAY_INIT_OPTION'}
+content_script.js:1 [BovadaHUD] PLAY_STAGE_INFO {pid: 'PLAY_STAGE_INFO', stageNo: '4903437406'}
+content_script.js:1 [BovadaHUD] CO_OPTION_INFO {pid: 'CO_OPTION_INFO', bblind: 25, sblind: 10, gameType: 2, gameType2: 5, …}
+content_script.js:1 [BovadaHUD] CO_TABLE_INFO {pid: 'CO_TABLE_INFO', time: 13, currentSeat: 6, dealerSeat: 3, lockSeat: 0, …}
+content_script.js:1 [BovadaHUD] SYS_INFO {type: 3, data: 30, dwData: 30, pid: 'SYS_INFO'}
+content_script.js:1 [BovadaHUD] PLAY_SEAT_INFO {pid: 'PLAY_SEAT_INFO', type: 1, seat: 1, state: 16, account: 0, …}
+content_script.js:1 [BovadaHUD] PLAY_ACCOUNT_CASH_RES {type: 2, seat: 1, cash: 2500, pid: 'PLAY_ACCOUNT_CASH_RES'}
+content_script.js:1 [BovadaHUD] PLAY_SEAT_RESERVATION {add: 0, seat: 1, pid: 'PLAY_SEAT_RESERVATION'}
+2.9648f208.chunk.js:2 Sending stats object:  {clientType: 'desktop', eventName: 'openGame', siteId: 100, intToken: '56e8644c-f268-4134-92ed-60f598a9cd40', pokerWsToken: '3577BB088DF845C1AC88A2E816E657BD', …}
+2.9648f208.chunk.js:2 Sending stats object:  {event: 'poker-multi-table-stats', siteId: 100, intToken: '56e8644c-f268-4134-92ed-60f598a9cd40', pokerWsToken: '3577BB088DF845C1AC88A2E816E657BD', gameServerIp: '10.51.29.228', …}
+content_script.js:1 [BovadaHUD] CO_PRESELECT_BLINDS {amountToPost: 25, pid: 'CO_PRESELECT_BLINDS'}
+content_script.js:1 [BovadaHUD] CO_SHOW_BTN {pid: 'CO_SHOW_BTN', show: 1}
+content_script.js:1 [BovadaHUD] PLAY_BUYIN_INFO {type: 1, seat: 1, displayMax: 2500, displayMin: 750, allowedMax: 0, …}
+content_script.js:1 [BovadaHUD] SYS_MSG_V2 {seat: 1, chat: '_amIBlocked_', pid: 'SYS_MSG_V2'}
+content_script.js:1 [BovadaHUD] CO_SELECT_INFO {pid: 'CO_SELECT_INFO', seat: 6, btn: 128, bet: 577, raise: 0, …}
+content_script.js:1 [BovadaHUD] PLAY_TIME_INFO {time: 15, pid: 'PLAY_TIME_INFO'}
+content_script.js:1 [BovadaHUD] CO_CURRENT_PLAYER {seat: 3, pid: 'CO_CURRENT_PLAYER'}
+content_script.js:1 [BovadaHUD] CO_SELECT_INFO {pid: 'CO_SELECT_INFO', seat: 3, btn: 1024, bet: 0, raise: 0, …}
+content_script.js:1 [BovadaHUD] CO_CHIPTABLE_INFO {pid: 'CO_CHIPTABLE_INFO', returnBet: 577, seat: 6, potCount: 0, curPot: Array(1), …}
+content_script.js:1 [BovadaHUD] CO_TABLE_STATE {tableState: 32768, pid: 'CO_TABLE_STATE'}
+content_script.js:1 [BovadaHUD] PLAY_TIME_INFO {time: 2, pid: 'PLAY_TIME_INFO'}
+content_script.js:1 [BovadaHUD] CO_CURRENT_PLAYER {seat: 6, pid: 'CO_CURRENT_PLAYER'}
+content_script.js:1 [BovadaHUD] CO_SHOW_INFO {seat: 6, btn: 32768, pid: 'CO_SHOW_INFO'}
+content_script.js:1 [BovadaHUD] CO_TABLE_STATE {tableState: 65536, pid: 'CO_TABLE_STATE'}
+content_script.js:1 [BovadaHUD] CO_RESULT_INFO {pid: 'CO_RESULT_INFO', account: Array(9)}
+content_script.js:1 [BovadaHUD] CO_POT_INFO {pid: 'CO_POT_INFO', kicker: 0, kickerCard: Array(9), potNo: 0, returnHi: Array(9), …}
+content_script.js:1 [BovadaHUD] CO_RABBITCARD_INFO {pos: 5, card: 31, pid: 'CO_RABBITCARD_INFO'}
+content_script.js:1 [BovadaHUD] PLAY_STAGE_END_REQ {pid: 'PLAY_STAGE_END_REQ'}
+content_script.js:1 [BovadaHUD] PLAY_STAGE_INFO {pid: 'PLAY_STAGE_INFO', stageNo: '4903437406'}
+content_script.js:1 [BovadaHUD] PLAY_CLEAR_INFO {pid: 'PLAY_CLEAR_INFO'}
+content_script.js:1 [BovadaHUD] CO_DEALER_SEAT {seat: 3, pid: 'CO_DEALER_SEAT'}
+content_script.js:1 [BovadaHUD] PLAY_SEAT_INFO {pid: 'PLAY_SEAT_INFO', type: 1, seat: 3, state: 32, account: 2570, …}
+content_script.js:1 [BovadaHUD] CO_PRESELECT_BLINDS {amountToPost: 0, pid: 'CO_PRESELECT_BLINDS'}
+content_script.js:1 [BovadaHUD] PLAY_STAGE_INFO {pid: 'PLAY_STAGE_INFO', stageNo: '4903437527'}
+content_script.js:1 [BovadaHUD] CO_TABLE_STATE {tableState: 2, pid: 'CO_TABLE_STATE'}
+content_script.js:1 [BovadaHUD] CO_DEALER_SEAT {seat: 2, pid: 'CO_DEALER_SEAT'}
+content_script.js:1 [BovadaHUD] CO_DEALER_SEAT {seat: 2, pid: 'CO_DEALER_SEAT'}
+content_script.js:1 [BovadaHUD] CO_TABLE_STATE {tableState: 4, pid: 'CO_TABLE_STATE'}
+content_script.js:1 [BovadaHUD] CO_BLIND_INFO {pid: 'CO_BLIND_INFO', seat: 2, account: 3842, baseStakes: 0, btn: 2, …}
+content_script.js:1 [BovadaHUD] CO_BLIND_INFO {pid: 'CO_BLIND_INFO', seat: 6, account: 2790, baseStakes: 0, btn: 4, …}
+content_script.js:1 [BovadaHUD] CO_TABLE_STATE {tableState: 8, pid: 'CO_TABLE_STATE'}
+content_script.js:1 [BovadaHUD] CO_CARDTABLE_INFO {pid: 'CO_CARDTABLE_INFO', seat2: Array(2), seat6: Array(2)}
+content_script.js:1 [BovadaHUD] PLAY_TIME_INFO {time: 15, pid: 'PLAY_TIME_INFO'}
+content_script.js:1 [BovadaHUD] CO_CURRENT_PLAYER {seat: 2, pid: 'CO_CURRENT_PLAYER'}
