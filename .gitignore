@@ -3,6 +3,8 @@ node_modules/
 
 # Build output
 dist/
+dist-firefox/
+web-ext-artifacts/
 
 # Vite / cache
 .vite/
@@ -23,3 +25,5 @@ yarn-error.log*
 .DS_Store
 .idea/
 *.swp
+extension-key.pem
+*.zip

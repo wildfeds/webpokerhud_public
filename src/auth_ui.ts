@@ -4,40 +4,37 @@
 // module renders state and forwards clicks to the background via messages.
 import { AuthState } from './auth';
 import { HudMessage, HudResponse } from './messages';
+import { html, setHtml, SafeHtml } from './ui/html';
 
 function send(message: HudMessage): Promise<HudResponse> {
   return chrome.runtime.sendMessage(message);
 }
 
-function esc(s: string): string {
-  return s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!));
-}
-
 // Fallback avatar: first letter of the name in a colored circle.
-function avatarHtml(state: AuthState): string {
+function avatarHtml(state: AuthState): SafeHtml {
   if (state.user.avatarUrl) {
-    return `<img class="account-avatar" src="${esc(state.user.avatarUrl)}" alt="" referrerpolicy="no-referrer" />`;
+    return html`<img class="account-avatar" src="${state.user.avatarUrl}" alt="" referrerpolicy="no-referrer" />`;
   }
   const letter = (state.user.name || state.user.email || '?')[0]!.toUpperCase();
-  return `<span class="account-avatar account-avatar-fallback">${esc(letter)}</span>`;
+  return html`<span class="account-avatar account-avatar-fallback">${letter}</span>`;
 }
 
 function render(el: HTMLElement, state: AuthState | null, busy = false, error = ''): void {
   if (busy) {
-    el.innerHTML = `<span class="account-note">Signing in…</span>`;
+    setHtml(el, html`<span class="account-note">Signing in…</span>`);
     return;
   }
   if (!state) {
-    el.innerHTML = `
+    setHtml(el, html`
       <button class="account-signin" id="account-signin">Sign in with Google</button>
-      ${error ? `<span class="account-error" title="${esc(error)}">⚠</span>` : ''}`;
+      ${error ? html`<span class="account-error" title="${error}">⚠</span>` : ''}`);
     return;
   }
-  el.innerHTML = `
+  setHtml(el, html`
     ${avatarHtml(state)}
-    <span class="account-name" title="${esc(state.user.email)}">${esc(state.user.name)}</span>
+    <span class="account-name" title="${state.user.email}">${state.user.name}</span>
     <span class="account-tier ${state.tier}">${state.tier === 'pro' ? 'Pro' : 'Free'}</span>
-    <button class="account-signout" id="account-signout" title="Sign out">Sign out</button>`;
+    <button class="account-signout" id="account-signout" title="Sign out">Sign out</button>`);
 }
 
 export interface AccountChip {
@@ -47,15 +44,28 @@ export interface AccountChip {
 
 // Mount the chip; returns a handle for re-syncing. onChange fires after any
 // state change (sign-in/out) so pages can re-render tier-dependent views.
+// The live auth state costs a network round trip (tier check) on every open,
+// so the last known state is kept in storage.local and painted first; the
+// live answer replaces it. A stale chip for ~300ms beats an empty one.
+const AUTH_SNAPSHOT_KEY = 'auth_snapshot';
+
 export function mountAccountChip(
   el: HTMLElement, onChange?: (state: AuthState | null) => void,
 ): AccountChip {
   let current: AuthState | null = null;
+  let live = false;   // true once the background has answered at least once
+
+  void chrome.storage.local.get({ [AUTH_SNAPSHOT_KEY]: null }).then(stored => {
+    const snap = stored[AUTH_SNAPSHOT_KEY] as AuthState | null;
+    if (!live && snap) render(el, snap);
+  });
 
   async function refresh(): Promise<AuthState | null> {
     const res = await send({ type: 'get_auth_state' });
     current = res.ok ? res.auth ?? null : null;
+    live = true;
     render(el, current);
+    void chrome.storage.local.set({ [AUTH_SNAPSHOT_KEY]: current });
     return current;
   }
 
@@ -66,14 +76,18 @@ export function mountAccountChip(
       void (async () => {
         const res = await send({ type: 'sign_in' });
         current = res.ok ? res.auth ?? null : null;
+        live = true;
         render(el, current, false, res.ok ? '' : res.error);
+        void chrome.storage.local.set({ [AUTH_SNAPSHOT_KEY]: current });
         onChange?.(current);
       })();
     } else if (target.id === 'account-signout') {
       void (async () => {
         await send({ type: 'sign_out' });
         current = null;
+        live = true;
         render(el, null);
+        void chrome.storage.local.set({ [AUTH_SNAPSHOT_KEY]: null });
         onChange?.(null);
       })();
     }

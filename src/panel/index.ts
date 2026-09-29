@@ -1,10 +1,13 @@
 // Analysis Panel — full-page off-table review. All aggregate views are
 // computed by the analysis server: get_panel_data uploads the locally stored
-// (filtered) hands and renders the tier-gated response. Free tier gets
-// Overview + Hands; Pro-only views (positions, cards, sessions, trends) show
-// an upgrade prompt. Hand replay stays local (reads the IndexedDB record).
+// (filtered) hands and renders the tier-gated response. Free tier keeps the
+// Overview and the Hands view (browse + replays) plus local import/export;
+// within Hands the big pots/wins/losses shortcuts grey out for free. The
+// deep views (positions, cards, sessions, trends) are displayed but locked
+// behind an upgrade prompt. Hand replay stays local (reads the IndexedDB
+// record).
 import {
-  HeroStats, Counter, StatsFilter, StakeLevelSummary, StakeStats, HandSummary,
+  Tier, HeroStats, Counter, StatsFilter, StakeLevelSummary, StakeStats, HandSummary,
   Leak, HoleCardMatrix, SessionSummary, RollingStats, PanelData, emptyPanelData,
   POSITION_ORDER, MATRIX_RANKS, seatPositions, counterPct, matrixKeyAt, netWonInHand,
 } from '../analysis';
@@ -20,6 +23,7 @@ import {
 } from '../overlay';
 import { HudMessage, HudResponse } from '../messages';
 import { mountAccountChip } from '../auth_ui';
+import { html, raw, setHtml, SafeHtml } from '../ui/html';
 
 const rangeEl   = document.getElementById('range') as HTMLSelectElement;
 const levelEl   = document.getElementById('level') as HTMLSelectElement;
@@ -35,7 +39,8 @@ const r1 = (x: number) => (Math.round(x * 10) / 10).toString();
 const signed = (x: number) => (x >= 0 ? '+' : '') + r1(x);
 const usd = (cents: number) => `$${(cents / 100).toFixed(2)}`;
 const chipClass = (n: number) => (n > 0 ? 'pos' : n < 0 ? 'neg' : '');
-const dollarCell = (cents: number) => `<span class="${chipClass(cents)}">${formatDollars(cents)}</span>`;
+const dollarCell = (cents: number) => html`<span class="${chipClass(cents)}">${formatDollars(cents)}</span>`;
+const EMPTY_MSG = html`<div class="empty">No hands for this selection.</div>`;
 
 // Current filter from the two selectors (empty = all).
 function currentFilter(): StatsFilter {
@@ -93,6 +98,47 @@ async function initControls(): Promise<void> {
     // Rolling stats come back with the rest of the panel payload.
     void renderAll();
   });
+
+  // Import lives here rather than the popup: a popup closes the moment the
+  // OS file dialog takes focus, killing any in-flight import. The panel is a
+  // real tab and survives both the dialog and long batch imports.
+  const importBtn = document.getElementById('import') as HTMLButtonElement;
+  const importFile = document.getElementById('import-file') as HTMLInputElement;
+  importBtn.addEventListener('click', () => importFile.click());
+  importFile.addEventListener('change', async () => {
+    const files = Array.from(importFile.files ?? []);
+    if (files.length === 0) return;
+    importBtn.disabled = true;
+    // The store dedupes by [platform, handId]; overlapping files are safe.
+    let imported = 0;
+    let skipped = 0;
+    let failed = 0;
+    try {
+      for (const [i, file] of files.entries()) {
+        importBtn.textContent = `⇪ ${i + 1}/${files.length}…`;
+        const res = await send({ type: 'import_hands', jsonl: await file.text() });
+        if (!res.ok) {
+          failed++;
+          console.warn(`[WebPokerHud] import of ${file.name} failed:`, res.error);
+          continue;
+        }
+        imported += res.imported ?? 0;
+        skipped += res.skipped ?? 0;
+        if (res.errors?.length) console.warn(`[WebPokerHud] import errors in ${file.name}:`, res.errors);
+      }
+      const parts = [`imported ${imported} hand(s) from ${files.length - failed} file(s)`];
+      if (skipped) parts.push(`${skipped} skipped`);
+      if (failed) parts.push(`${failed} file(s) failed`);
+      importBtn.textContent = '⇪ Import';
+      importBtn.title = `Last import: ${parts.join(', ')}`;
+      await reloadLevels();   // refresh stats, levels, and every view
+    } finally {
+      importBtn.disabled = false;
+      importBtn.textContent = '⇪ Import';
+      importFile.value = '';   // allow re-importing the same files
+    }
+  });
+
   renderHandFilterBar();
   await reloadLevels(String(stored.stat_stake));
 }
@@ -103,10 +149,10 @@ async function reloadLevels(desired = levelEl.value || 'all'): Promise<void> {
   const res = await send({ type: 'list_stake_levels', filter: timeFilter });
   levels = res.ok ? res.stakeLevels ?? [] : [];
 
-  levelEl.innerHTML = [
-    `<option value="all">All levels</option>`,
-    ...levels.map(l => `<option value="${l.level}">${formatStakeLevel(l.sb, l.bb)}</option>`),
-  ].join('');
+  setHtml(levelEl, html`${[
+    html`<option value="all">All levels</option>`,
+    ...levels.map(l => html`<option value="${l.level}">${formatStakeLevel(l.sb, l.bb)}</option>`),
+  ]}`);
   levelEl.value = Array.from(levelEl.options).some(o => o.value === desired) ? desired : 'all';
 
   await renderAll();
@@ -119,8 +165,8 @@ function renderSummary(stake: StakeStats[]): void {
   const tableEl = document.getElementById('stake-table')!;
 
   if (stake.length === 0) {
-    cardsEl.innerHTML = '';
-    tableEl.innerHTML = `<div class="empty">No hands for this selection.</div>`;
+    cardsEl.replaceChildren();
+    setHtml(tableEl, EMPTY_MSG);
     summaryEl.textContent = '';
     return;
   }
@@ -136,30 +182,30 @@ function renderSummary(stake: StakeStats[]): void {
   summaryEl.textContent = `${totalHands.toLocaleString()} hands · ${formatDollars(totalNet)}`;
 
   const card = (k: string, v: string, cls = '', key?: string) => {
-    const label = key ? `<span class="stat-term" data-stat="${key}">${k}</span>` : k;
-    return `<div class="card"><div class="k">${label}</div><div class="v ${cls}">${v}</div></div>`;
+    const label = key ? html`<span class="stat-term" data-stat="${key}">${k}</span>` : html`${k}`;
+    return html`<div class="card"><div class="k">${label}</div><div class="v ${cls}">${v}</div></div>`;
   };
-  cardsEl.innerHTML = [
+  setHtml(cardsEl, html`${[
     card('Hands', totalHands.toLocaleString()),
     card('Net won', formatDollars(totalNet), chipClass(totalNet)),
     card('bb / 100', signed(bb100), chipClass(bb100), 'bb100'),
     card('Hands won', `${r1(winPct)}%`, '', 'handsWon'),
     card('Sessions', String(totalSessions), '', 'sessions'),
-  ].join('');
+  ]}`);
 
-  tableEl.innerHTML = `<table>
+  setHtml(tableEl, html`<table>
     <thead><tr>
       <th>Stake</th><th>Hands</th><th>Won %</th><th>Sessions</th><th>Net</th><th>bb/100</th>
     </tr></thead>
-    <tbody>${stake.map(s => `<tr>
+    <tbody>${stake.map(s => html`<tr>
       <td>${formatStakeLevel(s.sb, s.bb)}</td>
       <td>${s.hands.toLocaleString()}</td>
       <td>${r1(s.hands > 0 ? (s.handsWon / s.hands) * 100 : 0)}%</td>
       <td>${s.sessions}</td>
       <td>${dollarCell(s.net)}</td>
       <td class="${chipClass(s.bb100)}">${signed(s.bb100)}</td>
-    </tr>`).join('')}</tbody>
-  </table>`;
+    </tr>`)}</tbody>
+  </table>`);
 }
 
 // Line colours: total green, all-in EV orange (PT4 convention).
@@ -176,29 +222,30 @@ function renderChart(total: number[], ev: number[]): void {
     ...(evDiffers ? [{ points: ev, color: LINE_EV }] : []),
   ], 1040, 300);
   if (!svg) {
-    el.innerHTML = `<div class="empty">Need at least two hands to plot.</div>`;
+    setHtml(el, html`<div class="empty">Need at least two hands to plot.</div>`);
     return;
   }
   const last = (xs: number[]) => xs.length > 0 ? xs[xs.length - 1]! : 0;
   const item = (color: string, label: string, key: string, v: number) =>
-    `<span><span class="swatch" style="background:${color}"></span><span
+    html`<span><span class="swatch" style="background:${color}"></span><span
        class="stat-term" data-stat="${key}">${label}</span> ${dollarCell(v)}</span>`;
-  el.innerHTML = `<div class="chart-legend">
+  setHtml(el, html`<div class="chart-legend">
     ${item(LINE_TOTAL, 'Total', 'lineTotal', last(total))}
     ${evDiffers ? item(LINE_EV, 'All-in EV', 'lineEv', Math.round(last(ev))) : ''}
-  </div>${svg}`;
+  </div>${raw(svg)}`);
 }
 
 function renderLeaks(leaks: Leak[]): void {
   const el = document.getElementById('leaks')!;
   if (leaks.length === 0) {
-    el.innerHTML = `<div class="empty">No hands for this selection.</div>`;
+    setHtml(el, EMPTY_MSG);
     return;
   }
-  el.innerHTML = leaks.map(l => `<div class="leak ${l.severity}">
+  // title/detail come from the analysis server — escaped by the html tag.
+  setHtml(el, html`${leaks.map(l => html`<div class="leak ${l.severity}">
     <div class="dot"></div>
     <div><div class="title">${l.title}</div><div class="detail">${l.detail}</div></div>
-  </div>`).join('');
+  </div>`)}`);
 }
 
 // ── Advanced stats ───────────────────────────────────────────────────────────
@@ -207,24 +254,24 @@ function renderLeaks(leaks: Leak[]): void {
 const MIN_SAMPLE = 15;
 
 // "62 (34)" — pct with opportunity count, dimmed under the min sample.
-function fmtCounter(c: Counter): string {
-  if (c.d === 0) return '<span class="low">—</span>';
-  const txt = `${r1(counterPct(c))} <span class="lbl">(${c.d})</span>`;
-  return c.d < MIN_SAMPLE ? `<span class="low">${txt}</span>` : txt;
+function fmtCounter(c: Counter): SafeHtml {
+  if (c.d === 0) return html`<span class="low">—</span>`;
+  const txt = html`${r1(counterPct(c))} <span class="lbl">(${c.d})</span>`;
+  return c.d < MIN_SAMPLE ? html`<span class="low">${txt}</span>` : txt;
 }
 
-function advRow(label: string, value: string, key?: string): string {
+function advRow(label: string, value: string | SafeHtml, key?: string): SafeHtml {
   const lbl = key
-    ? `<span class="lbl stat-term" data-stat="${key}">${label}</span>`
-    : `<span class="lbl">${label}</span>`;
-  return `<div class="adv-row">${lbl}<span>${value}</span></div>`;
+    ? html`<span class="lbl stat-term" data-stat="${key}">${label}</span>`
+    : html`<span class="lbl">${label}</span>`;
+  return html`<div class="adv-row">${lbl}<span>${value}</span></div>`;
 }
 
 // ── Stat glossary popover ────────────────────────────────────────────────────
 // Hovering a .stat-term shows a definition popover; stats with a recorded
 // example hand add a link that expands an inline replay. Clicking the term or
 // the popover pins it (closes on click-outside / Escape). Delegated listeners,
-// so innerHTML re-renders need no re-binding. Definitions live in
+// so full re-renders need no re-binding. Definitions live in
 // stat_info.ts (shared with the website's docs build).
 
 const pop = document.createElement('div');
@@ -269,13 +316,13 @@ function openPopover(anchor: HTMLElement, key: string): void {
   // the popover shows just the definition.
   const ex = info.example ? lastStats?.examples?.[info.example] : undefined;
   const exampleHtml = ex
-    ? `<a href="#" class="pop-link" data-hand="${ex.handId}" data-table="${ex.tableId}">
+    ? html`<a href="#" class="pop-link" data-hand="${ex.handId}" data-table="${ex.tableId}">
          Example hand · ${new Date(ex.timestamp).toLocaleString()} ▸
        </a><div class="pop-replay" hidden></div>`
     : '';
 
-  pop.innerHTML = `<div class="pop-title">${info.title}</div>
-    <div class="pop-def">${info.definition}</div>${exampleHtml}`;
+  setHtml(pop, html`<div class="pop-title">${info.title}</div>
+    <div class="pop-def">${info.definition}</div>${exampleHtml}`);
   pop.dataset.key = key;
   popPinned = false;
   pop.hidden = false;
@@ -291,10 +338,10 @@ async function expandExample(link: HTMLElement): Promise<void> {
   const area = pop.querySelector<HTMLElement>('.pop-replay');
   if (!area) return;
   area.hidden = false;
-  area.innerHTML = `<span class="empty">Loading…</span>`;
+  setHtml(area, html`<span class="empty">Loading…</span>`);
   const res = await send({ type: 'get_hand', handId: link.dataset.hand!, tableId: link.dataset.table! });
   const hand = res.ok ? res.hand : null;
-  area.innerHTML = hand ? replayHtml(hand) : `<span class="empty">Hand not found.</span>`;
+  setHtml(area, hand ? replayHtml(hand) : html`<span class="empty">Hand not found.</span>`);
 }
 
 document.addEventListener('mouseover', e => {
@@ -336,24 +383,25 @@ document.addEventListener('keydown', e => {
 function renderAdvanced(stats: HeroStats | null): void {
   const el = document.getElementById('advanced')!;
   if (!stats || stats.handsPlayed === 0) {
-    el.innerHTML = `<div class="empty">No hands for this selection.</div>`;
+    setHtml(el, EMPTY_MSG);
     return;
   }
-  const core = `<div class="card"><h3>Core</h3>
+  const slash = (parts: SafeHtml[]) => html`${parts.flatMap((p, i) => i === 0 ? [p] : [' / ', p])}`;
+  const core = html`<div class="card"><h3>Core</h3>
     ${advRow('VPIP', `${r1(stats.vpip)}%`, 'vpip')}
     ${advRow('PFR', `${r1(stats.pfr)}%`, 'pfr')}
     ${advRow('3-bet', `${r1(stats.threeBet)}%`, 'threeBet')}
     ${advRow('Fold to 3-bet', `${r1(stats.foldTo3Bet)}%`, 'foldTo3Bet')}
     ${advRow('AF (pre / F / T / R)',
-      `${r1(stats.af)} <span class="lbl">(${r1(stats.afByStreet.preflop)} / ${r1(stats.afByStreet.flop)} / ${r1(stats.afByStreet.turn)} / ${r1(stats.afByStreet.river)})</span>`, 'af')}
+      html`${r1(stats.af)} <span class="lbl">(${r1(stats.afByStreet.preflop)} / ${r1(stats.afByStreet.flop)} / ${r1(stats.afByStreet.turn)} / ${r1(stats.afByStreet.river)})</span>`, 'af')}
     ${advRow('WTSD', `${r1(stats.wtsd)}%`, 'wtsd')}
     ${advRow('W$SD', `${r1(stats.wsd)}%`, 'wsd')}
-    ${advRow('Win rate', `<span class="${chipClass(stats.winRate)}">${formatDollars(Math.round(stats.winRate))}</span>/hand`, 'winRate')}
+    ${advRow('Win rate', html`<span class="${chipClass(stats.winRate)}">${formatDollars(Math.round(stats.winRate))}</span>/hand`, 'winRate')}
   </div>`;
-  const preflop = `<div class="card"><h3>Preflop</h3>
+  const preflop = html`<div class="card"><h3>Preflop</h3>
     ${advRow('Steal', fmtCounter(stats.steal), 'steal')}
-    ${advRow('&nbsp;&nbsp;CO / BTN / SB',
-      `${fmtCounter(stats.stealByPos.co)} / ${fmtCounter(stats.stealByPos.btn)} / ${fmtCounter(stats.stealByPos.sb)}`, 'stealByPos')}
+    ${advRow('  CO / BTN / SB',
+      slash([fmtCounter(stats.stealByPos.co), fmtCounter(stats.stealByPos.btn), fmtCounter(stats.stealByPos.sb)]), 'stealByPos')}
     ${advRow('Fold BB to steal', fmtCounter(stats.foldBBToSteal), 'foldBBToSteal')}
     ${advRow('Fold SB to steal', fmtCounter(stats.foldSBToSteal), 'foldSBToSteal')}
     ${advRow('Squeeze', fmtCounter(stats.squeeze), 'squeeze')}
@@ -361,29 +409,29 @@ function renderAdvanced(stats: HeroStats | null): void {
     ${advRow('4-bet', fmtCounter(stats.fourBet), 'fourBet')}
     ${advRow('Fold to 4-bet', fmtCounter(stats.foldTo4Bet), 'foldTo4Bet')}
   </div>`;
-  const postflop = `<div class="card"><h3>Postflop</h3>
+  const postflop = html`<div class="card"><h3>Postflop</h3>
     ${advRow('C-bet (F / T / R)',
-      `${fmtCounter(stats.cbet.flop)} / ${fmtCounter(stats.cbet.turn)} / ${fmtCounter(stats.cbet.river)}`, 'cbet')}
+      slash([fmtCounter(stats.cbet.flop), fmtCounter(stats.cbet.turn), fmtCounter(stats.cbet.river)]), 'cbet')}
     ${advRow('Fold to c-bet (F / T / R)',
-      `${fmtCounter(stats.foldToCbet.flop)} / ${fmtCounter(stats.foldToCbet.turn)} / ${fmtCounter(stats.foldToCbet.river)}`, 'foldToCbet')}
+      slash([fmtCounter(stats.foldToCbet.flop), fmtCounter(stats.foldToCbet.turn), fmtCounter(stats.foldToCbet.river)]), 'foldToCbet')}
     ${advRow('Check-raise (F / T / R)',
-      `${fmtCounter(stats.checkRaise.flop)} / ${fmtCounter(stats.checkRaise.turn)} / ${fmtCounter(stats.checkRaise.river)}`, 'checkRaise')}
+      slash([fmtCounter(stats.checkRaise.flop), fmtCounter(stats.checkRaise.turn), fmtCounter(stats.checkRaise.river)]), 'checkRaise')}
     ${advRow('AFq (F / T / R)',
-      `${fmtCounter(stats.afq.flop)} / ${fmtCounter(stats.afq.turn)} / ${fmtCounter(stats.afq.river)}`, 'afq')}
+      slash([fmtCounter(stats.afq.flop), fmtCounter(stats.afq.turn), fmtCounter(stats.afq.river)]), 'afq')}
     ${advRow('Won when saw flop', fmtCounter(stats.wwsf), 'wwsf')}
   </div>`;
-  const note = `<div class="adv-note">Preflop / Postflop values read <strong>% (opportunities)</strong> —
+  const note = html`<div class="adv-note">Preflop / Postflop values read <strong>% (opportunities)</strong> —
     e.g. “62 (34)” = did it 62% of 34 chances; greyed out under ${MIN_SAMPLE} opportunities.
     Core values are plain percentages of all hands (AF is a ratio).
     Hover a stat name for its definition.</div>`;
-  el.innerHTML = core + preflop + postflop + note;
+  setHtml(el, html`${core}${preflop}${postflop}${note}`);
 }
 
 // ── Positions ────────────────────────────────────────────────────────────────
 
-function statCells(s: HeroStats): string {
+function statCells(s: HeroStats): SafeHtml {
   const net = Math.round(s.winRate * s.handsPlayed);
-  return `<td>${s.handsPlayed}</td>
+  return html`<td>${s.handsPlayed}</td>
     <td>${r1(s.vpip)}</td>
     <td>${r1(s.pfr)}</td>
     <td>${r1(s.threeBet)}</td>
@@ -397,20 +445,20 @@ function renderPositions(byPos: Record<string, HeroStats>, total: HeroStats | nu
   const el = document.getElementById('position-table')!;
   const present = POSITION_ORDER.filter(p => byPos[p]);
   if (present.length === 0) {
-    el.innerHTML = `<div class="empty">No hands for this selection.</div>`;
+    setHtml(el, EMPTY_MSG);
     return;
   }
   const h = (label: string, key: string) =>
-    `<th><span class="stat-term" data-stat="${key}">${label}</span></th>`;
-  const head = `<thead><tr>
+    html`<th><span class="stat-term" data-stat="${key}">${label}</span></th>`;
+  const head = html`<thead><tr>
     <th>Position</th><th>Hands</th>${h('VPIP', 'vpip')}${h('PFR', 'pfr')}${h('3B', 'threeBet')}
     ${h('AF', 'af')}${h('WTSD', 'wtsd')}${h('W$SD', 'wsd')}<th>Net</th>
   </tr></thead>`;
-  const rows = present.map(p => `<tr><td>${p}</td>${statCells(byPos[p]!)}</tr>`).join('');
+  const rows = present.map(p => html`<tr><td>${p}</td>${statCells(byPos[p]!)}</tr>`);
   const totalRow = total
-    ? `<tr style="border-top:2px solid var(--line)"><td><strong>Total</strong></td>${statCells(total)}</tr>`
+    ? html`<tr style="border-top:2px solid var(--line)"><td><strong>Total</strong></td>${statCells(total)}</tr>`
     : '';
-  el.innerHTML = `<table>${head}<tbody>${rows}${totalRow}</tbody></table>`;
+  setHtml(el, html`<table>${head}<tbody>${rows}${totalRow}</tbody></table>`);
 }
 
 // ── Starting-hand matrix ─────────────────────────────────────────────────────
@@ -419,18 +467,18 @@ function renderMatrix(matrix: HoleCardMatrix): void {
   const el = document.getElementById('matrix')!;
   const cells = Object.values(matrix);
   if (cells.length === 0) {
-    el.innerHTML = `<div class="empty">No hands with known hero cards for this selection.</div>`;
+    setHtml(el, html`<div class="empty">No hands with known hero cards for this selection.</div>`);
     return;
   }
   const maxAbs = Math.max(1, ...cells.map(c => Math.abs(c.net)));
 
-  let html = '<div class="matrix-grid">';
+  const parts: SafeHtml[] = [];
   for (let row = 0; row < MATRIX_RANKS.length; row++) {
     for (let col = 0; col < MATRIX_RANKS.length; col++) {
       const key = matrixKeyAt(row, col);
       const cell = matrix[key];
       if (!cell) {
-        html += `<div class="matrix-cell"><div class="key">${key}</div><div class="n">—</div></div>`;
+        parts.push(html`<div class="matrix-cell"><div class="key">${key}</div><div class="n">—</div></div>`);
         continue;
       }
       // Shade by net result; sqrt so small samples still register visibly.
@@ -439,11 +487,11 @@ function renderMatrix(matrix: HoleCardMatrix): void {
         : cell.net < 0 ? `rgba(255,107,107,${alpha})` : '';
       const vpipPct = r1((cell.vpip / cell.hands) * 100);
       const title = `${key} — ${cell.hands} hand${cell.hands === 1 ? '' : 's'} · ${formatDollars(cell.net)} · VPIP ${vpipPct}%`;
-      html += `<div class="matrix-cell dealt" data-key="${key}" title="${title}"${bg ? ` style="background:${bg}"` : ''}>
-        <div class="key">${key}</div><div class="n">${cell.hands}</div></div>`;
+      parts.push(html`<div class="matrix-cell dealt" data-key="${key}" title="${title}" style="${bg ? `background:${bg}` : ''}">
+        <div class="key">${key}</div><div class="n">${cell.hands}</div></div>`);
     }
   }
-  el.innerHTML = html + '</div>';
+  setHtml(el, html`<div class="matrix-grid">${parts}</div>`);
 
   el.querySelectorAll<HTMLElement>('.matrix-cell.dealt').forEach(cell => {
     cell.addEventListener('click', () => {
@@ -479,31 +527,31 @@ function renderSessions(): void {
   const chartEl = document.getElementById('session-chart')!;
   const tableEl = document.getElementById('sessions-table')!;
   if (allSessions.length === 0) {
-    chartEl.innerHTML = `<div class="empty">No hands for this selection.</div>`;
-    tableEl.innerHTML = '';
+    setHtml(chartEl, EMPTY_MSG);
+    tableEl.replaceChildren();
     return;
   }
 
   // Bars stay in play order regardless of the table sort.
-  chartEl.innerHTML = barChartSvg(allSessions.map(s => s.net), 1040, 220);
+  setHtml(chartEl, raw(barChartSvg(allSessions.map(s => s.net), 1040, 220)));
 
   const { key, dir } = sessionSort;
   const rows = [...allSessions].sort((a, b) => (SESSION_SORT_VAL[key](a) - SESSION_SORT_VAL[key](b)) * dir);
   const th = (k: SessionSortKey, label: string) =>
-    `<th class="sortable" data-sort="${k}">${label}${key === k ? (dir === 1 ? ' ▲' : ' ▼') : ''}</th>`;
+    html`<th class="sortable" data-sort="${k}">${label}${key === k ? (dir === 1 ? ' ▲' : ' ▼') : ''}</th>`;
 
-  tableEl.innerHTML = `<table>
+  setHtml(tableEl, html`<table>
     <thead><tr>
       ${th('start', 'Start')}${th('duration', 'Duration')}${th('hands', 'Hands')}${th('net', 'Net')}${th('bb100', 'bb/100')}
     </tr></thead>
-    <tbody>${rows.map(s => `<tr>
+    <tbody>${rows.map(s => html`<tr>
       <td>${new Date(s.start).toLocaleString()}</td>
       <td>${fmtDuration(s.end - s.start)}</td>
       <td>${s.hands}</td>
       <td>${dollarCell(s.net)}</td>
       <td class="${chipClass(sessionBb100(s))}">${signed(sessionBb100(s))}</td>
-    </tr>`).join('')}</tbody>
-  </table>`;
+    </tr>`)}</tbody>
+  </table>`);
 
   tableEl.querySelectorAll<HTMLElement>('th.sortable').forEach(h => {
     h.addEventListener('click', () => {
@@ -526,38 +574,41 @@ function renderTrends(rolling: RollingStats | null): void {
   const pctEl = document.getElementById('trend-pct')!;
   const bbEl  = document.getElementById('trend-bb')!;
   if (!rolling || rolling.vpip.length < 2) {
-    const msg = `<div class="empty">Need more hands than the rolling window
+    const msg = html`<div class="empty">Need more hands than the rolling window
       (${trendWindowEl.value}) to plot a trend.</div>`;
-    pctEl.innerHTML = msg;
-    bbEl.innerHTML = msg;
+    setHtml(pctEl, msg);
+    setHtml(bbEl, msg);
     return;
   }
   const pctFmt = (v: number) => `${r1(v)}%`;
   const item = (color: string, label: string, key: string) =>
-    `<span><span class="swatch" style="background:${color}"></span><span
+    html`<span><span class="swatch" style="background:${color}"></span><span
        class="stat-term" data-stat="${key}">${label}</span></span>`;
-  pctEl.innerHTML = `<div class="chart-legend">
+  setHtml(pctEl, html`<div class="chart-legend">
       ${item(TREND_VPIP, 'VPIP', 'vpip')}${item(TREND_PFR, 'PFR', 'pfr')}
-    </div>` + multiSeriesChartSvg([
+    </div>${raw(multiSeriesChartSvg([
     { points: rolling.vpip, color: TREND_VPIP },
     { points: rolling.pfr,  color: TREND_PFR },
-  ], 1040, 260, pctFmt);
+  ], 1040, 260, pctFmt))}`);
 
   const final = rolling.bb100[rolling.bb100.length - 1]!;
-  bbEl.innerHTML = multiSeriesChartSvg(
+  setHtml(bbEl, raw(multiSeriesChartSvg(
     [{ points: rolling.bb100, color: final >= 0 ? TREND_PFR : LINE_RED }],
-    1040, 260, v => signed(v));
+    1040, 260, v => signed(v))));
 }
 
 // ── Hands + replay ───────────────────────────────────────────────────────────
 
-function cardsHtml(cards: readonly string[]): string {
-  if (cards.length === 0) return '<span class="muted">—</span>';
-  return cards.map(c => `<span style="color:${cardColor(c as any)}">${cardLabel(c as any)}</span>`).join(' ');
+function cardsHtml(cards: readonly string[]): SafeHtml {
+  if (cards.length === 0) return html`<span class="muted">—</span>`;
+  return html`${cards.map(c =>
+    html`<span style="color:${cardColor(c as any)}">${cardLabel(c as any)}</span>`,
+  ).flatMap((s, i) => i === 0 ? [s] : [' ', s])}`;
 }
 
 let allHands: HandSummary[] = [];      // current selection, newest first
 let holeFilter: string | null = null;  // matrix cell key, e.g. "AKs"
+let currentTier: Tier = 'free';        // greys the Pro shortcuts until known
 
 // Line filters (34) + big-hands sort/presets (50) — pure logic in hand_filters.ts.
 let handFilters: HandFilterState = defaultHandFilters();
@@ -565,24 +616,32 @@ let handFilters: HandFilterState = defaultHandFilters();
 function renderHandFilterBar(): void {
   const el = document.getElementById('hand-filters')!;
   const current = activePreset(handFilters);
+  // The big pots/wins/losses shortcuts (presets + the matching sorts) are
+  // Pro: greyed out for the free tier, everything else stays usable.
+  const isFree = currentTier !== 'pro';
+  const proLock = raw(' disabled title="Pro feature — upgrade to unlock"');
   const presets = (Object.keys(PRESET_LABELS) as HandPreset[]).map(p =>
-    `<button class="preset${p === current ? ' active' : ''}" data-preset="${p}">${PRESET_LABELS[p]}</button>`);
-  const sel = (id: keyof HandFilterState, opts: [string, string][]) =>
-    `<select data-filter="${id}">${opts.map(([v, l]) =>
-      `<option value="${v}"${handFilters[id] === v ? ' selected' : ''}>${l}</option>`).join('')}</select>`;
-  el.innerHTML = [
+    html`<button class="preset${p === current ? ' active' : ''}" data-preset="${p}"${
+      isFree ? proLock : ''}>${PRESET_LABELS[p]}${isFree ? ' 🔒' : ''}</button>`);
+  const sel = (id: keyof HandFilterState, opts: [string, string][], lockedVals: string[] = []) =>
+    html`<select data-filter="${id}">${opts.map(([v, l]) =>
+      html`<option value="${v}"${handFilters[id] === v ? raw(' selected') : ''}${
+        lockedVals.includes(v) ? proLock : ''}>${l}${
+        lockedVals.includes(v) ? ' 🔒' : ''}</option>`)}</select>`;
+  setHtml(el, html`${[
     ...presets,
     sel('sort', [['newest', 'Newest first'], ['pot', 'Biggest pot'],
-      ['win', 'Biggest win'], ['loss', 'Biggest loss']]),
+      ['win', 'Biggest win'], ['loss', 'Biggest loss']],
+      isFree ? ['pot', 'win', 'loss'] : []),
     sel('position', [['all', 'All positions'], ...POSITION_ORDER.map(p => [p, p] as [string, string])]),
     sel('result', [['all', 'Won & lost'], ['won', 'Won'], ['lost', 'Lost']]),
     sel('street', [['all', 'Any street'], ['preflop', 'Ended preflop'], ['flop', 'Saw flop'],
       ['turn', 'Saw turn'], ['river', 'Saw river'], ['showdown', 'Showdown']]),
     sel('line', [['all', 'Any line'], ['3bp', '3-bet pot'], ['pfa', 'As PF aggressor']]),
-    sel('pot', [['all', 'Any pot'], ['small', '&lt; 10 bb'], ['mid', `10–${BIG_POT_BB} bb`],
+    sel('pot', [['all', 'Any pot'], ['small', '< 10 bb'], ['mid', `10–${BIG_POT_BB} bb`],
       ['big', `${BIG_POT_BB}+ bb`]]),
-    `<button class="link-btn" id="reset-hand-filters">Reset</button>`,
-  ].join('');
+    html`<button class="link-btn" id="reset-hand-filters">Reset</button>`,
+  ]}`);
 }
 
 document.getElementById('hand-filters')!.addEventListener('change', e => {
@@ -614,15 +673,15 @@ function renderHands(): void {
   const el = document.getElementById('hands-table')!;
   const hands = applyHandFilters(allHands, handFilters, holeFilter);
   const chip = holeFilter
-    ? `<div class="filter-chip">Cards: <strong>${holeFilter}</strong>
+    ? html`<div class="filter-chip">Cards: <strong>${holeFilter}</strong>
          <button id="clear-hole-filter" title="Clear filter">✕</button></div>`
     : '';
-  const count = `<span class="muted" style="font-size:12px">${hands.length} hand${hands.length === 1 ? '' : 's'} match</span>`;
+  const count = html`<span class="muted" style="font-size:12px">${hands.length} hand${hands.length === 1 ? '' : 's'} match</span>`;
 
   if (hands.length === 0) {
-    el.innerHTML = `${chip}<div class="empty">No hands for this selection.</div>`;
+    setHtml(el, html`${chip}${EMPTY_MSG}`);
   } else {
-    const rows = hands.slice(0, 500).map(h => `<tr class="clickable" data-hand="${h.handId}" data-table="${h.tableId}">
+    const rows = hands.slice(0, 500).map(h => html`<tr class="clickable" data-hand="${h.handId}" data-table="${h.tableId}">
       <td>${new Date(h.timestamp).toLocaleString()}</td>
       <td>${formatStakeLevel(h.sb, h.bb)}</td>
       <td>${h.position ?? '—'}</td>
@@ -630,11 +689,11 @@ function renderHands(): void {
       <td class="board-cards">${cardsHtml(h.board)}</td>
       <td>${r1(h.potBb)} bb</td>
       <td>${dollarCell(h.net)}</td>
-    </tr>`).join('');
-    el.innerHTML = `${chip}${count}<table>
+    </tr>`);
+    setHtml(el, html`${chip}${count}<table>
       <thead><tr><th>Time</th><th>Stake</th><th>Pos</th><th>Hand</th><th>Board</th><th>Pot</th><th>Net</th></tr></thead>
       <tbody>${rows}</tbody>
-    </table>`;
+    </table>`);
   }
 
   document.getElementById('clear-hole-filter')?.addEventListener('click', () => {
@@ -671,7 +730,7 @@ const ACTION_VERB: Record<ActionType, string> = {
   [ActionType.MUCK]:    'mucks',
 };
 
-function actionLine(hand: Hand, a: Action, positions: Map<number, string>, heroId: string): string {
+function actionLine(hand: Hand, a: Action, positions: Map<number, string>, heroId: string): SafeHtml {
   const pos = positions.get(a.seat);
   const who = `${pos ? pos + ' ' : ''}(seat ${a.seat})`;
   const showsAmount = a.amount > 0 &&
@@ -681,29 +740,29 @@ function actionLine(hand: Hand, a: Action, positions: Map<number, string>, heroI
   const shown = a.type === ActionType.SHOW
     ? hand.players.find(p => p.seat === a.seat)?.cards : null;
   const shownHtml = shown && shown.length === 2
-    ? ` <span class="board-cards">${cardsHtml(shown)}</span>` : '';
+    ? html` <span class="board-cards">${cardsHtml(shown)}</span>` : '';
   const hero = a.playerId === heroId ? ' hero' : '';
-  return `<div class="act${hero}"><span class="who">${who}</span><span>${ACTION_VERB[a.type]}${amt}${shownHtml}</span></div>`;
+  return html`<div class="act${hero}"><span class="who">${who}</span><span>${ACTION_VERB[a.type]}${amt}${shownHtml}</span></div>`;
 }
 
 // Street-by-street replay markup for a hand — shared by the Hands tab and the
 // stat-glossary popover's inline example.
-function replayHtml(hand: Hand): string {
+function replayHtml(hand: Hand): SafeHtml {
   const heroId = hand.players.find(p => p.isHero)?.playerId ?? '';
   const positions = seatPositions(hand);
 
   const blocks = REPLAY_STREETS.map(block => {
     const acts = hand.actions.filter(a => block.streets.includes(a.street));
-    if (acts.length === 0 && block.label !== 'Preflop') return '';
+    if (acts.length === 0 && block.label !== 'Preflop') return html``;
     const board = hand.board.slice(0, block.boardTo);
     const boardHtml = board.length > 0
-      ? `<span class="board-cards">${cardsHtml(board)}</span>` : '';
-    const lines = acts.map(a => actionLine(hand, a, positions, heroId)).join('');
-    return `<div class="street-block">
+      ? html`<span class="board-cards">${cardsHtml(board)}</span>` : '';
+    const lines = acts.map(a => actionLine(hand, a, positions, heroId));
+    return html`<div class="street-block">
       <div class="street-head"><span>${block.label}</span>${boardHtml}</div>
-      ${lines || '<div class="act muted">—</div>'}
+      ${lines.length > 0 ? lines : html`<div class="act muted">—</div>`}
     </div>`;
-  }).join('');
+  });
 
   const heroCards = hand.players.find(p => p.isHero)?.cards ?? [];
   const net = netWonInHand(hand, heroId);
@@ -714,12 +773,11 @@ function replayHtml(hand: Hand): string {
     .filter(p => !p.isHero && (p.cards?.length ?? 0) === 2)
     .map(p => {
       const pos = positions.get(p.seat);
-      return `<div><span class="muted">${pos ? pos + ' ' : ''}(seat ${p.seat}):</span>
+      return html`<div><span class="muted">${pos ? pos + ' ' : ''}(seat ${p.seat}):</span>
         <span class="board-cards">${cardsHtml(p.cards!)}</span></div>`;
-    })
-    .join('');
+    });
 
-  return `
+  return html`
     <div style="margin-bottom:10px">
       <div><span class="muted">Hero:</span> <span class="board-cards">${cardsHtml(heroCards)}</span>
       <span class="muted"> · ${formatStakeLevel(hand.stakes.sb, hand.stakes.bb)} · pot ${usd(hand.totalPot)}</span></div>
@@ -734,21 +792,23 @@ function replayHtml(hand: Hand): string {
 
 async function showReplay(handId: string, tableId: string): Promise<void> {
   const el = document.getElementById('replay')!;
-  el.innerHTML = `<span class="empty">Loading…</span>`;
+  setHtml(el, html`<span class="empty">Loading…</span>`);
   const res = await send({ type: 'get_hand', handId, tableId });
   const hand = res.ok ? res.hand : null;
-  el.innerHTML = hand ? replayHtml(hand) : `<span class="empty">Hand not found.</span>`;
+  setHtml(el, hand ? replayHtml(hand) : html`<span class="empty">Hand not found.</span>`);
 }
 
 // ── Locked (Pro-only) views ──────────────────────────────────────────────────
 
 const UPGRADE_URL = 'https://webpokerhud.com/pricing';
 
-function upgradeHtml(what: string): string {
-  return `<div class="upgrade-box">
+function upgradeHtml(what: string): SafeHtml {
+  return html`<div class="upgrade-box">
     <div class="upgrade-title">🔒 ${what} is a Pro feature</div>
     <p>Sign in with Google (top right) and upgrade to Pro to unlock position
-       stats, the starting-hand matrix, sessions and trends.</p>
+       stats, the starting-hand matrix, sessions, trends, and the big
+       pots/wins/losses shortcuts in the hand history. Browsing, replaying,
+       exporting and importing your hands stays free.</p>
     <a class="upgrade-btn" href="${UPGRADE_URL}" target="_blank" rel="noreferrer">See plans</a>
   </div>`;
 }
@@ -765,7 +825,7 @@ function renderLockedView(view: string): void {
   const spec = VIEW_CONTAINERS[view];
   if (!spec) return;
   spec.ids.forEach((id, i) => {
-    document.getElementById(id)!.innerHTML = i === 0 ? upgradeHtml(spec.name) : '';
+    setHtml(document.getElementById(id)!, i === 0 ? upgradeHtml(spec.name) : html``);
   });
 }
 
@@ -812,9 +872,17 @@ async function renderAll(): Promise<void> {
   if (locked.has('trends')) renderLockedView('trends');
   else renderTrends(data.rolling);
 
+  // The tier drives which filter-bar shortcuts are greyed out; a downgrade
+  // also drops any Pro-only sort back to the default.
+  const tier: Tier = (res.ok ? res.tier : undefined) ?? 'free';
+  if (tier !== currentTier) {
+    currentTier = tier;
+    if (tier !== 'pro' && handFilters.sort !== 'newest') handFilters.sort = 'newest';
+  }
+  renderHandFilterBar();
   allHands = data.hands;
   renderHands();
-  document.getElementById('replay')!.innerHTML = `<span class="empty">Select a hand to replay.</span>`;
+  setHtml(document.getElementById('replay')!, html`<span class="empty">Select a hand to replay.</span>`);
 }
 
 // Signing in or out changes the tier, which changes what the server unlocks —

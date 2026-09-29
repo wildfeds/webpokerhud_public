@@ -1,8 +1,9 @@
--- Supabase schema for accounts (website/design.md §5, AUTH_SETUP.md).
+-- Supabase schema for accounts (website/design.md §5, docs/AUTH_SETUP.md).
 -- Run once in the Supabase SQL editor (or via supabase db push); the whole
 -- file is idempotent, so re-running after edits is safe.
--- Writes to entitlements/payments come only from the service role
--- (payment webhook); authenticated users can only read their own rows.
+-- Writes to entitlements/purchases come only from the analysis server
+-- (secret key / service role); authenticated users can only read their own
+-- rows.
 
 -- ── Profiles ─────────────────────────────────────────────────────────────────
 -- One row per auth user, kept in sync from the auth record by trigger.
@@ -78,24 +79,101 @@ create policy "read own entitlement"
   to authenticated
   using (user_id = (select auth.uid()));
 
-create table if not exists payments (
-  id                 uuid primary key default gen_random_uuid(),
-  user_id            uuid not null references auth.users on delete cascade,
-  provider           text not null,      -- 'coinbase_commerce'
-  provider_charge_id text unique not null,
-  amount_usd         numeric not null,
-  months             int not null,
-  status             text not null check (status in ('pending', 'confirmed', 'failed')),
-  created_at         timestamptz not null default now()
+-- ── Purchases (docs/PURCHASES.md) ─────────────────────────────────────────────────
+-- One row per checkout attempt; the row IS the mapping from a provider
+-- order_id back to user/plan (NOWPayments only echoes order_id). Writes come
+-- only from the analysis server (secret key); users read their own rows.
+
+drop table if exists payments;   -- pre-launch stub, superseded by purchases
+
+create table if not exists purchases (
+  id           uuid primary key,          -- the provider-facing order_id
+  user_id      uuid not null references auth.users on delete cascade,
+  provider     text not null default 'nowpayments',
+  invoice_id   text,
+  payment_id   text,
+  plan         text not null check (plan in ('month', 'year')),
+  amount_usd   numeric(10, 2) not null,
+  status       text not null default 'pending'
+    check (status in ('pending', 'completed', 'partially_paid', 'refunded', 'failed')),
+  created_at   timestamptz not null default now(),
+  completed_at timestamptz
 );
 
-alter table payments enable row level security;
+alter table purchases enable row level security;
 
-drop policy if exists "read own payments" on payments;
-create policy "read own payments"
-  on payments for select
+drop policy if exists "read own purchases" on purchases;
+create policy "read own purchases"
+  on purchases for select
   to authenticated
   using (user_id = (select auth.uid()));
+
+-- Atomic, idempotent fulfillment: flip the row pending→completed and extend
+-- the entitlement in one transaction. The WHERE status='pending' guard makes
+-- concurrent IPN retries / confirm races grant Pro exactly once.
+create or replace function public.fulfill_purchase(p_order_id uuid, p_payment_id text default null)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user uuid;
+  v_days int;
+begin
+  update purchases
+     set status = 'completed', completed_at = now(),
+         payment_id = coalesce(p_payment_id, payment_id)
+   where id = p_order_id and status = 'pending'
+   returning user_id, case plan when 'month' then 30 else 365 end
+    into v_user, v_days;
+  if v_user is null then
+    return false;   -- unknown order, or already fulfilled
+  end if;
+
+  update entitlements
+     set plan = 'pro',
+         expires_at = greatest(now(), coalesce(expires_at, now()))
+                        + make_interval(days => v_days),
+         updated_at = now()
+   where user_id = v_user;
+  return true;
+end;
+$$;
+
+-- Refund (merchant-initiated on the provider side): mark the row and take the
+-- purchased period back; an expires_at in the past means free (fail-closed).
+create or replace function public.refund_purchase(p_order_id uuid)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user uuid;
+  v_days int;
+begin
+  update purchases
+     set status = 'refunded'
+   where id = p_order_id and status = 'completed'
+   returning user_id, case plan when 'month' then 30 else 365 end
+    into v_user, v_days;
+  if v_user is null then
+    return false;
+  end if;
+
+  update entitlements
+     set expires_at = expires_at - make_interval(days => v_days),
+         updated_at = now()
+   where user_id = v_user;
+  return true;
+end;
+$$;
+
+-- security definer functions are executable by PUBLIC unless revoked; only
+-- the server (service role via secret key) may fulfill or refund.
+revoke all on function public.fulfill_purchase(uuid, text) from public, anon, authenticated;
+revoke all on function public.refund_purchase(uuid) from public, anon, authenticated;
 
 -- Pre-launch email waitlist (design.md §5 "Waitlist"): anonymous visitors may
 -- insert their email and nothing else — no select, update, or delete.

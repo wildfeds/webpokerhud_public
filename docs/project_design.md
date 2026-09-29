@@ -12,8 +12,15 @@ A Chrome MV3 extension with a freemium split:
 
 | Tier | Features | Where it runs |
 |---|---|---|
-| **Free** | Live HUD overlay, hero + opponent tracking, popup stat viewer, net-winnings graph, JSONL/JSON export | 100% client-side, data stays in the user's browser (IndexedDB) |
-| **Pro (subscription)** | Analysis panel, hand review, future: leak detection, session reports, opponent pool insights | Server-side analysis API, gated by subscription |
+| **Free** | Live HUD overlay, hero + opponent tracking, popup stat viewer, net-winnings graph, hand **export/import in pure JSON** (open `hand.v1` format), panel **overview** (stats, winnings/EV chart, leaks), hand-history **browser** (all hands, line filters, replays) | Tracking, export/import, and replays are 100% client-side (IndexedDB); the overview and hand list come from the panel API ungated |
+| **Pro (subscription)** | Deep **analysis**: position stats, starting-hand matrix, sessions, trends, and the one-click big pots/wins/losses shortcuts in the hand history; future: opponent pool insights | Server-side analysis API, gated by subscription — locked views stay visible (tabs + greyed shortcuts) as the upgrade funnel |
+
+The line between tiers: **your raw hands and the basic picture are free**
+(overview, browsing, replaying, exporting, importing — the anti-lock-in
+promise); the **deep cuts we compute over them** (positional breakdowns,
+matrix, sessions, trends, big-hand retrieval) are the Pro product. Locked
+features are displayed greyed/locked, not hidden, so free users always see
+what Pro adds.
 
 The free tier is the funnel: it must be genuinely good, and "your hands never
 leave your machine" is a privacy selling point in itself. Pro is where compute-

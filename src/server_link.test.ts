@@ -1,6 +1,18 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
+import { gunzipSync } from 'node:zlib';
 import { fetchPanelData } from './server_link';
 import { emptyPanelData } from './analysis/panel_types';
+
+// Uploads are gzipped (Content-Encoding: gzip) when CompressionStream exists,
+// which it does under Node — decode what the stub captured.
+function decodeBody(init: RequestInit): unknown {
+  const enc = (init.headers as Record<string, string>)['Content-Encoding'];
+  const body = init.body as ArrayBuffer | string;
+  const text = enc === 'gzip'
+    ? gunzipSync(Buffer.from(body as ArrayBuffer)).toString('utf8')
+    : String(body);
+  return JSON.parse(text);
+}
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -32,7 +44,7 @@ describe('fetchPanelData', () => {
     const result = await fetchPanelData([], 100, 'jwt-abc');
     expect(requested).toBe('http://srv:1/v1/panel');   // trailing slash normalised
     expect((init!.headers as Record<string, string>)['Authorization']).toBe('Bearer jwt-abc');
-    expect(JSON.parse(String(init!.body))).toEqual({ window: 100, hands: [] });
+    expect(decodeBody(init!)).toEqual({ window: 100, hands: [] });
     expect(result.tier).toBe('pro');
     expect(result.locked).toEqual([]);
     expect(result.panel).toEqual(panel);

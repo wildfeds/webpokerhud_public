@@ -22,7 +22,10 @@ export function toJsonl(hands: Hand[]): string {
 
 // chrome.downloads glue ──────────────────────────────────────────────────────
 
-// MV3 service workers have no URL.createObjectURL, so downloads use data: URLs.
+// Chrome MV3 service workers have no URL.createObjectURL, so downloads there
+// use data: URLs. Firefox's background is an event page which does have it;
+// blob URLs handle large exports better and aren't revoked explicitly — the
+// browser reclaims them when the event page suspends.
 function toDataUrl(text: string): string {
   const bytes = new TextEncoder().encode(text);
   let binary = '';
@@ -30,15 +33,22 @@ function toDataUrl(text: string): string {
   return `data:application/x-ndjson;base64,${btoa(binary)}`;
 }
 
-// Write all stored hands to Downloads/bovada_hud/<platform>_<tableId>.jsonl,
+function toDownloadUrl(text: string): string {
+  if (typeof URL.createObjectURL === 'function') {
+    return URL.createObjectURL(new Blob([text], { type: 'application/x-ndjson' }));
+  }
+  return toDataUrl(text);
+}
+
+// Write all stored hands to Downloads/webpokerhud/<platform>_<tableId>.jsonl,
 // one file per table. Returns the number of files written.
 export async function exportHands(store: HandStore): Promise<number> {
   const hands = await store.query({});
   const groups = groupHandsByTable(hands);
   for (const [name, group] of groups) {
     await chrome.downloads.download({
-      url:            toDataUrl(toJsonl(group)),
-      filename:       `bovada_hud/${name}.jsonl`,
+      url:            toDownloadUrl(toJsonl(group)),
+      filename:       `webpokerhud/${name}.jsonl`,
       conflictAction: 'overwrite',
       saveAs:         false,
     });

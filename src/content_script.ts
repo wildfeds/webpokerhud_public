@@ -56,10 +56,12 @@ function updateSeatChips(): void {
   const logKey = `${lastGs.maxSeats}|${lastGs.heroSeat}|${occupiedArr.join(',')}|${seatRows.length}`;
   if (logKey !== lastChipLogKey) {
     lastChipLogKey = logKey;
-    console.log(`[BovadaHUD] seat chips: maxSeats=${lastGs.maxSeats} hero=${lastGs.heroSeat}`
+    console.log(`[WebPokerHud] seat chips: maxSeats=${lastGs.maxSeats} hero=${lastGs.heroSeat}`
       + ` occupied=[${occupiedArr.join(',')}] statsRows=${seatRows.length}`);
   }
-  seatChips.update(seatRows, lastGs.maxSeats || 9, lastGs.heroSeat, occupiedArr);
+  // Sticky hero fallback: a fresh game state (e.g. after a reconnect) can
+  // carry heroSeat 0 — without it the hero chip would render as an opponent's.
+  seatChips.update(seatRows, lastGs.maxSeats || 9, lastGs.heroSeat || heroSeat, occupiedArr);
 }
 
 // The connector only receives events in the frame hosting the RGS WebSocket,
@@ -96,19 +98,47 @@ async function createPanelSettings(): Promise<void> {
 }
 
 connector.on('hand_complete', (hand) => {
-  console.log('[BovadaHUD] hand_complete', hand.handId, hand);
+  console.log('[WebPokerHud] hand_complete', hand.handId, hand);
   send({ type: 'hand_complete', hand })
     .then((res) => {
-      if (!res) console.error('[BovadaHUD] no response from background');
-      else if (!res.ok) console.error('[BovadaHUD] failed to store hand:', res.error);
+      if (!res) console.error('[WebPokerHud] no response from background');
+      else if (!res.ok) console.error('[WebPokerHud] failed to store hand:', res.error);
       else void refreshStats();
     })
-    .catch((err: unknown) => console.error('[BovadaHUD] failed to reach background:', err));
+    .catch((err: unknown) => console.error('[WebPokerHud] failed to reach background:', err));
 });
+
+// Diagnostics (BF-009 hunt): a stuck HUD on a live table means events stopped
+// flowing or the connector throws on each one. Guard the dispatch so one
+// poisoned event can't look like silence, and watchdog the feed itself.
+let lastEventAt = 0;
+let handleErrors = 0;
+let stallWarned = false;
 
 window.addEventListener('message', (event: MessageEvent) => {
   if (!event.data || event.data.source !== HUD_MESSAGE_SOURCE) return;
-  connector.handleEvent(event.data.msg as Record<string, unknown>);
+  lastEventAt = Date.now();
+  stallWarned = false;
+  try {
+    connector.handleEvent(event.data.msg as Record<string, unknown>);
+  } catch (err) {
+    // First few in full (the offending event is the bug report), then sampled.
+    if (handleErrors++ < 5 || handleErrors % 250 === 0) {
+      console.error(`[WebPokerHud] connector.handleEvent threw (#${handleErrors}):`,
+        err, JSON.stringify(event.data.msg));
+    }
+  }
 });
 
-console.log('[BovadaHUD] content script ready');
+setInterval(() => {
+  if (lastEventAt === 0 || stallWarned) return;   // never saw events / already flagged
+  const quietMs = Date.now() - lastEventAt;
+  if (quietMs > 120_000) {
+    stallWarned = true;
+    console.warn(`[WebPokerHud] FEED STALLED: no game events for ${Math.round(quietMs / 1000)}s`
+      + ` in this frame (handleEvent errors so far: ${handleErrors}).`
+      + ' Check the RGS socket state in DevTools → Network → WS.');
+  }
+}, 30_000);
+
+console.log('[WebPokerHud] content script ready');

@@ -10,6 +10,8 @@ const STORE_NAME  = 'hands';
 export class IndexedDBStore implements HandStore {
   private dbPromise: Promise<IDBDatabase> | null = null;
 
+  // The database name predates the rebrand; renaming it would orphan every
+  // user's stored hands, so it stays.
   constructor(private readonly dbName = 'bovada_hud') {}
 
   private open(): Promise<IDBDatabase> {

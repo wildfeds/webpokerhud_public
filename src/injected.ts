@@ -51,15 +51,39 @@ window.WebSocket = new Proxy(NativeWebSocket, {
       : new Target(url);
 
     const urlStr = (url as { toString(): string }).toString();
-    console.log('[BovadaHUD] WebSocket created:', urlStr);
+    console.log('[WebPokerHud] WebSocket created:', urlStr);
 
     if (urlStr.includes(RGS_URL_FRAGMENT)) {
-      console.log('[BovadaHUD] RGS WebSocket hooked');
+      console.log('[WebPokerHud] RGS WebSocket hooked');
+      // Lifecycle diagnostics (BF-009 hunt): a table that keeps playing while
+      // the HUD goes silent means either this socket died and the app moved
+      // to a transport we don't tap (Atmosphere falls back to XHR polling),
+      // or frames stopped being parseable. Make both cases loud.
+      let msgCount = 0;
+      let nonString = 0;
       ws.addEventListener('message', (event: MessageEvent<string>) => {
+        if (typeof event.data !== 'string') {
+          if (nonString++ === 0) {
+            console.warn('[WebPokerHud] RGS message with non-string data:',
+              Object.prototype.toString.call(event.data));
+          }
+          return;
+        }
+        msgCount++;
         const events = parseFrame(event.data);
         for (const msg of events) {
           window.postMessage({ source: HUD_MESSAGE_SOURCE, msg }, '*');
         }
+      });
+      ws.addEventListener('close', (e: CloseEvent) => {
+        console.warn(`[WebPokerHud] RGS socket CLOSED code=${e.code}`
+          + ` reason=${JSON.stringify(e.reason)} wasClean=${e.wasClean}`
+          + ` after ${msgCount} messages (${nonString} non-string) — if the table`
+          + ' keeps playing with no new RGS socket hooked, the app fell back to'
+          + ' a non-WebSocket transport');
+      });
+      ws.addEventListener('error', () => {
+        console.warn(`[WebPokerHud] RGS socket error after ${msgCount} messages`);
       });
     }
 
@@ -67,4 +91,4 @@ window.WebSocket = new Proxy(NativeWebSocket, {
   },
 }) as unknown as typeof WebSocket;
 
-console.log('[BovadaHUD] WebSocket hook installed');
+console.log('[WebPokerHud] WebSocket hook installed');

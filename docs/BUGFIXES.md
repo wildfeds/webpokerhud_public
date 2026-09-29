@@ -14,6 +14,29 @@ Symptom / Root cause / Fix / Verified
 
 ---
 
+## BF-008 — Hero chip rendered as a sixth opponent chip over the bet area (FIXED)
+
+**2026-09-27 · overlay/seat_chips + content_script**
+
+- **Symptom:** six chips on a 6-max table instead of five; the extra chip sat
+  on the hero's stack/bet area, hiding the bet value.
+- **Root cause:** `updateSeatChips` passed `lastGs.heroSeat` straight through;
+  a post-reconnect game state carries `heroSeat` 0, so the hero filter matched
+  nothing and the hero's chip rendered at an opponent anchor.
+- **Fix (by design change):** the hero chip is now a feature — it always
+  renders (session image awareness) but anchors BELOW the seat container,
+  cleared `HERO_CHIP_CLEARANCE_PX` past the action banner, with a green seat
+  badge. Hero identification is DOM-first — the one seat container lacking
+  Bovada's `isNotMyPlayer` marker (trusted only when unique) — falling back
+  to the protocol heroSeat, now sticky across reconnects in the content
+  script. Scene-model fallback uses `HERO_CHIP_Y_OFFSET_PX` for the south
+  seat.
+- **Verified:** 4-table live session in Firefox — one chip per occupied seat,
+  hero chip below the seat with green badge, bet values unobstructed;
+  `chipRows`/anchor unit tests updated (177 passing).
+
+---
+
 ## BF-007 — All-in loss over-counted by the uncalled excess (FIXED)
 
 **2026-09-12 · analysis/hero_stats (loser net)**
@@ -133,6 +156,47 @@ Symptom / Root cause / Fix / Verified
 
 ---
 
+## BF-010 — Hero chip reset to a single hand after a top-up / refresh (FIXED)
+
+**2026-09-28 · analysis/seat_stats**
+
+- **Symptom:** the hero's own seat chip showed near-empty stats (e.g.
+  `0/0 · AF 0 · 1h`) while the HUD session line for the same table read
+  several hands (e.g. "6 hands"); most visible right after a page refresh.
+- **Root cause:** `computeSeatSessionStats` detects a new seat occupant by a
+  stack discontinuity (this hand's `startStack` ≠ last hand's
+  `startStack + netWon`) and resets that seat's window. The hero trips this
+  constantly — topping up chips, and on refresh the account balance is
+  re-read — even though the hero seat never changes occupant.
+- **Fix:** exempt `p.isHero` from the occupant-change reset; the hero's
+  identity is known and fixed for the session, so their window accumulates
+  through top-ups and refreshes. Opponents (anonymous) keep the heuristic.
+- **Verified:** new unit test (hero stack jumps 1000→2000, window stays at
+  2 hands); full suite green.
+
+---
+
+## BF-009 — One table's capture stalls silently mid-session (OPEN, instrumented)
+
+**2026-09-28 · injected + content_script**
+
+- **Symptom:** one of four tables freezes at "N hands" with a stale LIVE
+  section while the table keeps playing; other tables keep recording. No
+  console errors in the affected frame (checked live once).
+- **Leading theory:** Bovada's Atmosphere stack falls back to XHR
+  long-polling after a dropped WebSocket; our tap is WS-only, so the frame
+  goes permanently deaf. (No errors rules out the poisoned-parser theory
+  for the observed occurrence.)
+- **Instrumentation shipped:** RGS socket close/error logging with message
+  counts, non-string frame detection, a guarded handleEvent that logs the
+  offending event, and a FEED STALLED watchdog (2 min of silence in a
+  previously active frame). Next occurrence identifies itself in the
+  frame's console.
+- **Planned fix once confirmed:** tap the Atmosphere XHR/fetch fallback
+  transport alongside WebSocket.
+
+---
+
 ## Open / watch list
 
 - **Wide-tile residual offset (~20 px right on the east column)** — the
@@ -143,6 +207,9 @@ Symptom / Root cause / Fix / Verified
   check chips the next time one table runs maximised.
 - **Seat departures** — occupancy only shrinks on the next `CO_TABLE_INFO`
   snapshot; an empty seat can keep a stale `0/0` chip until then.
-- **True table-size field** — chips assume 6-max whenever the hero sits in
-  seats 1–6; a real 9-max table will misplace chips until the protocol field
-  is identified (candidate: `gameType2`).
+- **True table-size field** — still unidentified (candidate: `gameType2`),
+  but it no longer gates 9-max: since the v4 DOM anchors, every rendered
+  seat (1–9) is anchored by its own digit leaf, so 9-max tables get chips on
+  all seats. The field only matters for the scene-model *fallback* (whole
+  DOM scan empty), which still assumes 6-max geometry when the hero sits in
+  seats 1–6 and stays empty otherwise.

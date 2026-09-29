@@ -12,7 +12,7 @@ export default async function DocsIndex() {
       <div className="mt-8 space-y-10">
         {sidebar.map((s) => (
           <section key={s.section}>
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-felt-400">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-400">
               {s.section}
             </h2>
             <ul className="mt-3 space-y-2">
@@ -20,7 +20,7 @@ export default async function DocsIndex() {
                 <li key={item.slug}>
                   <Link
                     href={`/docs/${item.slug}/`}
-                    className="text-lg text-felt-100 underline-offset-4 hover:underline"
+                    className="text-lg text-ink-100 underline-offset-4 hover:underline"
                   >
                     {item.title}
                   </Link>

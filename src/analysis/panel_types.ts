@@ -7,8 +7,10 @@ import { HeroStats } from './hero_stats';
 
 export type Tier = 'free' | 'pro';
 
-// Panel views the server locks for the free tier ('overview' and 'hands'
-// always stay available).
+// Panel views the server locks for the free tier. 'overview' and 'hands'
+// (browse + replays) always stay available, as does client-side hand
+// export/import; within the Hands view the big pots/wins/losses shortcuts
+// grey out per tier.
 export type ProView = 'positions' | 'cards' | 'sessions' | 'trends';
 
 // ── Per stake-level summary ──────────────────────────────────────────────────

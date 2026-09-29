@@ -521,7 +521,7 @@ Tiered by priority. **P0** = the analytics core that everything else consumes; *
 | 46 | P2 | Graphical replayer — SVG table, seats, pot; equity & pot odds per street | L5 | 🔲 Todo |
 | 47 | P2 | Rake report — total rake, rake in bb/100 | L4/L5 | 🔲 Todo |
 
-**Where we are — Phase 3 P0 + P1 complete** (33 built then removed in the performance pass). Shipped beyond the original list: the 32E stat-glossary popovers with example-hand replays, the panel performance pass (aggregate `get_panel_data`, `CachedHandStore`, memoised EV), and Enhancement P3 (per-seat stat chips over the table art — three live-debug rounds calibrated the scene model — plus the panel's manual ↻ Refresh). Remaining: the P2 tier (38, 44–47), 9-max chip anchors, and the still-unidentified protocol field for visual table size (chips currently assume 6-max whenever the hero sits in seats 1–6).
+**Where we are — Phase 3 P0 + P1 complete** (33 built then removed in the performance pass). Shipped beyond the original list: the 32E stat-glossary popovers with example-hand replays, the panel performance pass (aggregate `get_panel_data`, `CachedHandStore`, memoised EV), and Enhancement P3 (per-seat stat chips over the table art — three live-debug rounds calibrated the scene model — plus the panel's manual ↻ Refresh). Remaining: the P2 tier (38, 44–47) and the still-unidentified protocol field for visual table size (only relevant to the scene-model fallback now — since the v4 DOM anchors, 9-max tables get chips on every rendered seat with no measured anchor row needed).
 
 ---
 

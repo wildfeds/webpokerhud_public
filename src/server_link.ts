@@ -9,8 +9,9 @@
 import { Hand } from './model';
 import { PanelData, Tier } from './analysis/panel_types';
 
-// Local dev default; becomes the hosted API URL at launch.
-export const DEFAULT_ANALYSIS_SERVER_URL = 'http://localhost:8787';
+// Hosted API. For local dev, override from the service-worker console:
+//   setServerUrl('http://localhost:8787')
+export const DEFAULT_ANALYSIS_SERVER_URL = 'https://api.webpokerhud.com';
 
 const STORAGE_KEY = 'analysis_server_url';
 
@@ -33,6 +34,17 @@ export interface PanelFetchResult {
 // accessToken is the Supabase JWT (null when signed out). Throws with a
 // user-facing message when the server is unreachable or errors; the
 // background relays that as { ok: false, error }.
+// Hand uploads are megabytes of repetitive JSON that gzip ~16x smaller —
+// upload time, not server compute, dominates panel latency. Falls back to
+// plain JSON where CompressionStream is unavailable (the server accepts both).
+async function encodeBody(json: string): Promise<{ body: BodyInit; encoding?: string }> {
+  if (typeof CompressionStream === 'undefined') return { body: json };
+  const gzipped = await new Response(
+    new Blob([json]).stream().pipeThrough(new CompressionStream('gzip')),
+  ).arrayBuffer();
+  return { body: gzipped, encoding: 'gzip' };
+}
+
 export async function fetchPanelData(
   hands: Hand[], window: number, accessToken: string | null = null, timeoutMs = 30_000,
 ): Promise<PanelFetchResult> {
@@ -42,13 +54,15 @@ export async function fetchPanelData(
   try {
     let res: Response;
     try {
+      const { body, encoding } = await encodeBody(JSON.stringify({ window, hands }));
       res = await fetch(`${url.replace(/\/$/, '')}/v1/panel`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(encoding ? { 'Content-Encoding': encoding } : {}),
           ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         },
-        body: JSON.stringify({ window, hands }),
+        body,
         signal: controller.signal,
       });
     } catch (err) {

@@ -27,10 +27,12 @@ the cumulative net-winnings graph across all your sessions.
 
 ## 4. The analysis panel
 
-Open the full-page panel from the popup for the deep dive: stat breakdowns by
-position and stake, hand history with replays, hole-card matrix, session
-summaries, and the luck-adjusted (all-in EV) winnings line. Hover any stat
-term for its definition — the same definitions as the
+Open the full-page panel from the popup. The overview (your stats, winnings
+and EV charts, leak highlights) and the hand history — filters and
+street-by-street replays included — are free. Pro unlocks the deep views:
+stat breakdowns by position, the hole-card matrix, session summaries,
+trends, and the one-click big pots / big wins / big losses shortcuts. Hover
+any stat term for its definition — the same definitions as the
 [stat glossary](/docs/stats/).
 
 ## 5. Your data

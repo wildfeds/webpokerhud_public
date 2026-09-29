@@ -41,7 +41,7 @@ export default function Waitlist() {
 
   if (status === 'done') {
     return (
-      <p className="rounded-lg bg-felt-800 px-4 py-3 text-felt-100">
+      <p className="rounded-full border border-ink-800 bg-ink-900 px-5 py-3 text-sm text-ink-100">
         You&apos;re on the list — we&apos;ll email you at launch.
       </p>
     );
@@ -55,12 +55,12 @@ export default function Waitlist() {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="you@example.com"
-        className="flex-1 rounded-lg border border-felt-700 bg-felt-900 px-4 py-2.5 text-white placeholder-felt-400 outline-none focus:border-felt-400"
+        className="flex-1 rounded-full border border-ink-700 bg-ink-900 px-5 py-2.5 text-sm text-white placeholder-ink-400 outline-none transition-colors focus:border-accent-400"
       />
       <button
         type="submit"
         disabled={status === 'submitting'}
-        className="rounded-lg bg-felt-500 px-5 py-2.5 font-semibold text-white hover:bg-felt-400 disabled:opacity-50"
+        className="rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-ink-950 transition-colors hover:bg-ink-200 disabled:opacity-50"
       >
         {status === 'submitting' ? 'Joining…' : 'Join the waitlist'}
       </button>

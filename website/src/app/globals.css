@@ -2,15 +2,32 @@
 @plugin '@tailwindcss/typography';
 
 @theme {
-  --color-felt-50: #f2f8f4;
-  --color-felt-100: #dceee3;
-  --color-felt-200: #b9ddc9;
-  --color-felt-300: #8cc4a7;
-  --color-felt-400: #5aa681;
-  --color-felt-500: #3a8a64;
-  --color-felt-600: #296e4f;
-  --color-felt-700: #215841;
-  --color-felt-800: #1d4735;
-  --color-felt-900: #193b2d;
-  --color-felt-950: #0c211a;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  /* Neutral near-black surface scale (cool zinc family).
+     Roles: 950 page bg · 900 card bg · 800 card borders · 700 input borders ·
+     400 muted text · 300 secondary text · 200 body text · 50 headings. */
+  --color-ink-50: #fafafa;
+  --color-ink-100: #f0f0f2;
+  --color-ink-200: #d6d6db;
+  --color-ink-300: #a3a3ad;
+  --color-ink-400: #75757e;
+  --color-ink-500: #55555d;
+  --color-ink-600: #3d3d44;
+  --color-ink-700: #2d2d33;
+  --color-ink-800: #202025;
+  --color-ink-900: #131316;
+  --color-ink-950: #0a0a0c;
+
+  /* Single restrained accent (indigo) — links, highlights, focus rings.
+     Primary CTAs are white-on-dark, not accent-filled. */
+  --color-accent-300: #a5b4fc;
+  --color-accent-400: #818cf8;
+  --color-accent-500: #6366f1;
+  --color-accent-600: #4f46e5;
+}
+
+::selection {
+  background: var(--color-accent-500);
+  color: #fff;
 }

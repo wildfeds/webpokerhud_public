@@ -1,39 +1,81 @@
 {
   "manifest_version": 3,
-  "name": "Bovada HUD",
-  "version": "0.1.0",
-  "description": "Real-time poker HUD for Bovada",
-  "permissions": ["storage", "downloads", "unlimitedStorage", "identity"],
-  "host_permissions": [
+  "name": "WebPokerHud",
+  "version": "1.0.0",
+  "description": "Live poker HUD with real-time stats and hand-history analytics for your browser.",
+  "{{chrome}}.key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqgTexpEaNyzHY1FeDhhUkbYis+TBYFRGc88N8+cuHq1yLNRE/xr+XuiJS3PDwO1b2MbiQMZKrVAaBo8ePvkCXWuFmZ36pPtAePPSRK1+S8UFY23XN3ETpjpr0H6U8ISThUsXt7s/s6LSbhd6YtbT7zkkcvecuB+AIyioydMKjqLksZrbffpXIP5bwR1FJ+qyqTWlFngURd6Kf58Tmty/DURUBaZD1x0QmgLRwlbSNU9XvUBoV+wZRl8Fhvj11IFoGmeC0DgPsH682oCW/k2jSD9YvQwhvAjI5ffhgsHYQ5dRBbj/l7qEPElsKRJOh4gb9NArvY4gE4Nlm1AVUQ8YGwIDAQAB",
+  "{{firefox}}.browser_specific_settings": {
+    "gecko": {
+      "id": "webpokerhud@webpokerhud.com",
+      "strict_min_version": "128.0",
+      "data_collection_permissions": {
+        "required": ["none"],
+        "optional": ["authenticationInfo", "websiteContent"]
+      }
+    }
+  },
+  "permissions": [
+    "storage",
+    "downloads",
+    "unlimitedStorage",
+    "identity"
+  ],
+  "{{chrome}}.host_permissions": [
     "https://www.bovada.lv/*",
     "http://localhost/*",
     "https://api.webpokerhud.com/*"
   ],
-  "background": {
+  "{{firefox}}.host_permissions": [
+    "https://www.bovada.lv/*",
+    "https://api.webpokerhud.com/*"
+  ],
+  "{{chrome}}.background": {
     "service_worker": "src/background.ts",
+    "type": "module"
+  },
+  "{{firefox}}.background": {
+    "scripts": ["src/background.ts"],
     "type": "module"
   },
   "content_scripts": [
     {
-      "matches": ["https://www.bovada.lv/*"],
-      "js": ["src/injected.ts"],
+      "matches": [
+        "https://www.bovada.lv/*"
+      ],
+      "js": [
+        "src/injected.ts"
+      ],
       "run_at": "document_start",
       "world": "MAIN",
       "all_frames": true
     },
     {
-      "matches": ["https://www.bovada.lv/*"],
-      "js": ["src/content_script.ts"],
+      "matches": [
+        "https://www.bovada.lv/*"
+      ],
+      "js": [
+        "src/content_script.ts"
+      ],
       "run_at": "document_start",
       "all_frames": true
     }
   ],
   "action": {
     "default_popup": "src/popup/index.html",
-    "default_title": "Bovada HUD"
+    "default_title": "WebPokerHud",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png"
+    }
   },
   "options_ui": {
     "page": "src/panel/index.html",
     "open_in_tab": true
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
   }
 }

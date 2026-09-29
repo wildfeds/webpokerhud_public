@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import {
   seatAnchors, sceneTransform, chipRows, resolveLayoutSize,
-  SCENE_W, SCENE_H, CHIP_Y_OFFSET_PX,
+  SCENE_W, SCENE_H, CHIP_Y_OFFSET_PX, HERO_CHIP_Y_OFFSET_PX, HERO_CHIP_CLEARANCE_PX,
+  anchorAboveSeat, anchorBelowSeat, cardBoxOf, type Rect,
 } from './seat_chips';
 
 describe('sceneTransform', () => {
@@ -22,10 +23,10 @@ describe('sceneTransform', () => {
 describe('seatAnchors', () => {
   const W = SCENE_W, H = SCENE_H;   // calibration tile → scale 1, offset 0
 
-  it('anchors the hero seat at the south position, below the action banner', () => {
+  it('anchors the hero seat at the south position, below pill and banner', () => {
     const p = seatAnchors(6, 4, W, H).get(4)!;
     expect(p.x).toBeCloseTo(338, 6);
-    expect(p.y).toBeCloseTo(366 + CHIP_Y_OFFSET_PX, 6);
+    expect(p.y).toBeCloseTo(366 + HERO_CHIP_Y_OFFSET_PX, 6);
   });
 
   it('places hero+1 clockwise at the south-west anchor', () => {
@@ -99,7 +100,7 @@ describe('chipRows', () => {
   const stats = (seat: number, hands: number) => ({ seat, hands, vpip: 50, pfr: 25, af: 2 });
 
   it('defaults occupied seats without stats to all zeros', () => {
-    const rows = chipRows([stats(3, 12)], [2, 3, 5], 1);
+    const rows = chipRows([stats(3, 12)], [2, 3, 5]);
     expect(rows).toEqual([
       { seat: 2, hands: 0, vpip: 0, pfr: 0, af: 0 },
       stats(3, 12),
@@ -107,12 +108,52 @@ describe('chipRows', () => {
     ]);
   });
 
-  it('excludes the hero seat and unoccupied stats rows', () => {
-    const rows = chipRows([stats(1, 9), stats(6, 4)], [1, 2], 1);
-    expect(rows).toEqual([{ seat: 2, hands: 0, vpip: 0, pfr: 0, af: 0 }]);
+  it('includes the hero seat and drops unoccupied stats rows', () => {
+    const rows = chipRows([stats(1, 9), stats(6, 4)], [1, 2]);
+    expect(rows).toEqual([stats(1, 9), { seat: 2, hands: 0, vpip: 0, pfr: 0, af: 0 }]);
   });
 
   it('sorts by seat number', () => {
-    expect(chipRows([], [5, 2, 4], 3).map(r => r.seat)).toEqual([2, 4, 5]);
+    expect(chipRows([], [5, 2, 4]).map(r => r.seat)).toEqual([2, 4, 5]);
+  });
+});
+
+
+
+
+
+
+describe('anchorAboveSeat / anchorBelowSeat / cardBoxOf', () => {
+  const pill: Rect = { left: 370, top: 287, width: 134, height: 33 };
+  const cards: Rect = { left: 400, top: 247, width: 75, height: 61 };
+
+  it('centres on the pill with the chip bottom just above the card block', () => {
+    const p = anchorAboveSeat(pill, cardBoxOf(pill, cards));
+    expect(p.x).toBe(437);
+    expect(p.y).toBe(247 - 6);
+  });
+
+  it('anchors the hero chip below the container, cleared past the banner', () => {
+    // Container bottom = pill bottom (287+33=320) — the card block sits above.
+    const p = anchorBelowSeat(pill, cardBoxOf(pill, cards));
+    expect(p.x).toBe(437);
+    expect(p.y).toBe(320 + HERO_CHIP_CLEARANCE_PX);
+  });
+
+  it('clears a card box that extends below the pill', () => {
+    const tallBox: Rect = { left: 360, top: 280, width: 150, height: 80 };   // bottom 360
+    expect(anchorBelowSeat(pill, tallBox).y).toBe(360 + HERO_CHIP_CLEARANCE_PX);
+  });
+
+  it('falls back to the pill top when the parent is not a real card box', () => {
+    expect(cardBoxOf(pill, null)).toBe(pill);
+    expect(cardBoxOf(pill, { left: 0, top: 0, width: 0, height: 0 })).toBe(pill);
+    // A parent that starts BELOW the pill is some other wrapper, not cards.
+    expect(cardBoxOf(pill, { left: 300, top: 400, width: 200, height: 50 })).toBe(pill);
+    // A page-sized wrapper (mid-relayout when a player leaves) is not cards.
+    expect(cardBoxOf(pill, { left: 0, top: 0, width: 800, height: 500 })).toBe(pill);
+    // A far-away box above the seat is not adjacent to the pill.
+    expect(cardBoxOf(pill, { left: 380, top: 40, width: 80, height: 60 })).toBe(pill);
+    expect(anchorAboveSeat(pill, cardBoxOf(pill, null)).y).toBe(287 - 6);
   });
 });

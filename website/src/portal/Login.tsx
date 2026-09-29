@@ -21,13 +21,13 @@ export default function Login() {
 
   return (
     <div className="flex max-w-md flex-col gap-3">
-      <p className="text-felt-200">
+      <p className="text-ink-200">
         Sign in with your Google account — no passwords, ever.
       </p>
       <button
         onClick={signIn}
         disabled={status === 'redirecting'}
-        className="flex items-center justify-center gap-3 rounded-lg bg-white px-5 py-2.5 font-semibold text-gray-800 hover:bg-gray-100 disabled:opacity-50"
+        className="flex items-center justify-center gap-3 rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-ink-950 transition-colors hover:bg-ink-200 disabled:opacity-50"
       >
         {/* Google "G" */}
         <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">

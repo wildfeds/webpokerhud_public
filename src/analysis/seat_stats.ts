@@ -39,7 +39,13 @@ export function computeSeatSessionStats(
     for (const p of hand.players) {
       let acc = bySeat.get(p.seat) ?? fresh();
       // Stack doesn't follow from the previous hand → new occupant (or rebuy).
-      if (acc.expectedStack !== null && Math.abs(p.startStack - acc.expectedStack) > 1) {
+      // The hero is exempt: their identity is known and fixed for the session,
+      // so a stack jump is a top-up or a post-refresh re-read of the account
+      // balance, never a seat change — resetting here wiped the hero's own
+      // chip back to a single hand after every top-up/refresh (BF-010).
+      if (!p.isHero
+          && acc.expectedStack !== null
+          && Math.abs(p.startStack - acc.expectedStack) > 1) {
         acc = fresh();
       }
       const w = walkSeat(hand, p.playerId);

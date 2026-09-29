@@ -5,8 +5,8 @@ import { computeSeatSessionStats, SESSION_GAP_MS } from './seat_stats';
 
 const TABLE = 'table-1';
 
-function player(seat: number, startStack = 1000) {
-  return { seat, playerId: `bovada:${TABLE}:${seat}`, startStack, cards: null, isHero: false };
+function player(seat: number, startStack = 1000, isHero = false) {
+  return { seat, playerId: `bovada:${TABLE}:${seat}`, startStack, cards: null, isHero };
 }
 
 function act(seat: number, type: ActionType, amount: number, street = Street.PREFLOP) {
@@ -49,6 +49,21 @@ describe('computeSeatSessionStats', () => {
       [hand(0), hand(60_000, { 2: 2000, 3: 970 })], TABLE);
     expect(rows.find(r => r.seat === 2)!.hands).toBe(1);   // window reset
     expect(rows.find(r => r.seat === 3)!.hands).toBe(2);   // continuous
+  });
+
+  it('does not reset the hero seat on a stack jump (top-up / refresh)', () => {
+    // BF-010: the hero tops up chips (or the page refreshes and re-reads the
+    // account balance), so their startStack won't follow from the last hand —
+    // but the hero's identity is fixed, so the window must keep accumulating.
+    const heroHand = (timestamp: number, stack: number) => makeHand({
+      timestamp, tableId: TABLE,
+      players: [player(1, stack, true), player(3, 1000)],
+      actions: [act(1, ActionType.RAISE, 30), act(3, ActionType.CALL, 30)],
+      results: [],
+    });
+    // Hand 1 leaves the hero at 970; hand 2 shows them at 2000 (topped up).
+    const rows = computeSeatSessionStats([heroHand(0, 1000), heroHand(60_000, 2000)], TABLE);
+    expect(rows.find(r => r.seat === 1)!.hands).toBe(2);   // NOT reset
   });
 
   it('ignores hands from other tables', () => {

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Bovada HUD — Analysis</title>
+  <title>WebPokerHud — Analysis</title>
   <style>
     :root {
       --bg: #1a1a2e;
@@ -159,7 +159,8 @@
       font-size: 12px;
       cursor: pointer;
     }
-    .filter-bar .preset:hover { background: #32325e; }
+    .filter-bar .preset:hover:not(:disabled) { background: #32325e; }
+    .filter-bar .preset:disabled { opacity: 0.45; cursor: not-allowed; }
     .filter-bar .preset.active {
       background: var(--accent);
       border-color: var(--accent);
@@ -302,7 +303,7 @@
 <body>
   <header>
     <div class="header-top">
-      <h1>Bovada HUD — Analysis</h1>
+      <h1>WebPokerHud — Analysis</h1>
       <div id="account" class="account"></div>
     </div>
     <div class="controls">
@@ -314,6 +315,8 @@
       </select>
       <select id="level"></select>
       <button id="refresh" title="Recompute all stats from the latest stored hands">↻ Refresh</button>
+      <button id="import" title="Import hand-history JSONL files (multi-select supported)">⇪ Import</button>
+      <input type="file" id="import-file" accept=".jsonl,.ndjson,application/x-ndjson" multiple hidden />
       <span id="summary-line" class="muted"></span>
     </div>
     <div id="server-banner" hidden></div>

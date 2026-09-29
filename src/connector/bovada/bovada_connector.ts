@@ -68,17 +68,17 @@ export class BovadaConnector extends ConnectorEmitter implements PlatformConnect
 
   private onConnectLoginInfo(ev: RawEvent): void {
     this.heroId = String(ev['nickName'] ?? '');
-    console.log('[BovadaHUD] Connector: hero id =', this.heroId);
+    console.log('[WebPokerHud] Connector: hero id =', this.heroId);
   }
 
   private onPlayTableNumber(ev: RawEvent): void {
     this.tableId    = String(ev['tableNo'] ?? '');
     this.gs.tableId = this.tableId;
-    console.log('[BovadaHUD] Connector: table id =', this.tableId);
+    console.log('[WebPokerHud] Connector: table id =', this.tableId);
   }
 
   private onPlaySeatInfo(ev: RawEvent): void {
-    console.log('[BovadaHUD] PLAY_SEAT_INFO', JSON.stringify(ev));
+    console.log('[WebPokerHud] PLAY_SEAT_INFO', JSON.stringify(ev));
     const seat     = Number(ev['seat']);
     const account  = Number(ev['account']);
     const nickName = String(ev['nickName'] ?? '');
@@ -133,7 +133,7 @@ export class BovadaConnector extends ConnectorEmitter implements PlatformConnect
     // Rare join-time event — log it whole while the table-size signal is
     // being hunted ("maxSeat" reads 9 even on 6-max tables; gameType2 is a
     // candidate for the real table-size field).
-    console.log('[BovadaHUD] CO_OPTION_INFO', JSON.stringify(ev));
+    console.log('[WebPokerHud] CO_OPTION_INFO', JSON.stringify(ev));
     this.gs.stakes   = { sb: Number(ev['sblind']), bb: Number(ev['bblind']) };
     this.gs.gameType = ev['gameType'] === 2 ? 'nlhe' : String(ev['gameType']);
     // "maxSeat" is the seat-array width (9 even on 6-max tables), kept as an
@@ -150,7 +150,7 @@ export class BovadaConnector extends ConnectorEmitter implements PlatformConnect
     const seatState = ev['seatState'];
     if (Array.isArray(seatState)) {
       this.gs.occupiedSeats = decodeOccupiedSeats(seatState);
-      console.log('[BovadaHUD] CO_TABLE_INFO seatState=' + JSON.stringify(seatState)
+      console.log('[WebPokerHud] CO_TABLE_INFO seatState=' + JSON.stringify(seatState)
         + ' account=' + JSON.stringify(ev['account'])
         + ' → occupied=[' + this.gs.occupiedSeats.join(',') + ']');
       this.emit('state_update', this.gs);   // show seat chips on landing

@@ -26,11 +26,11 @@ export default function App() {
 
   if (!supabase) {
     return (
-      <p className="rounded-lg bg-felt-800 px-4 py-3 text-felt-200">
+      <p className="rounded-lg bg-ink-800 px-4 py-3 text-ink-200">
         Accounts aren&apos;t available on this deployment yet.
       </p>
     );
   }
-  if (user === undefined) return <p className="text-felt-300">Loading…</p>;
+  if (user === undefined) return <p className="text-ink-300">Loading…</p>;
   return user ? <Account user={user} /> : <Login />;
 }

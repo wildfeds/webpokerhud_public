@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Bovada HUD</title>
+  <title>WebPokerHud</title>
   <style>
     body {
       width: 320px;
@@ -74,6 +74,14 @@
     }
     button:disabled { background: #555; cursor: default; }
     #status { margin-top: 6px; color: #8f8; min-height: 1em; }
+    .perm {
+      background: rgba(255,107,107,0.12);
+      border: 1px solid rgba(255,107,107,0.4);
+      border-radius: 6px;
+      padding: 8px 10px;
+      margin: 0 0 10px;
+    }
+    .perm button { margin-top: 6px; padding: 5px 10px; font-size: 12px; }
     /* Account chip */
     .account { display: flex; align-items: center; gap: 8px; min-height: 28px; margin: 0 0 10px; }
     .account-avatar {
@@ -98,7 +106,11 @@
   </style>
 </head>
 <body>
-  <h2>Bovada HUD</h2>
+  <h2>WebPokerHud</h2>
+  <div id="perm" class="perm" hidden>
+    WebPokerHud needs access to bovada.lv to capture hands and show the HUD.
+    <br /><button id="perm-btn">Grant access</button>
+  </div>
   <div id="account" class="account"></div>
   <label><input type="checkbox" id="hud-toggle" /> Show HUD overlay on tables</label>
 
@@ -120,7 +132,6 @@
   <button id="panel-btn">Open analysis panel</button>
   <button id="export-btn">Export hands</button>
   <button id="import-btn">Import hands</button>
-  <input type="file" id="import-file" accept=".jsonl,.ndjson,application/x-ndjson" hidden />
   <p id="status"></p>
   <p id="storage" class="muted"></p>
   <script type="module" src="./index.ts"></script>

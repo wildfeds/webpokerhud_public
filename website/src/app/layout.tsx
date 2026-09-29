@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
 import Link from 'next/link';
 import './globals.css';
 import { SITE_NAME, SITE_TAGLINE, SITE_URL, SUPPORT_EMAIL } from '@/lib/site';
+
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -10,7 +13,7 @@ export const metadata: Metadata = {
     template: `%s — ${SITE_NAME}`,
   },
   description:
-    'Free live poker HUD as a Chrome extension. Real-time stats over the table, hand tracking and winnings graphs — your hands never leave your machine.',
+    'Free live poker HUD as a Firefox extension. Real-time stats over the table, hand tracking and winnings graphs — your hands never leave your machine.',
 };
 
 const nav = [
@@ -21,16 +24,21 @@ const nav = [
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-felt-950 text-felt-50 antialiased">
-        <header className="border-b border-felt-800">
-          <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
-            <Link href="/" className="text-lg font-bold tracking-tight">
+    <html lang="en" className={inter.variable}>
+      <body className="min-h-screen bg-ink-950 font-sans text-ink-50 antialiased">
+        {/* No backdrop-blur: it re-blurs on every scroll frame on iOS Safari. */}
+        <header className="sticky top-0 z-40 border-b border-ink-800/70 bg-ink-950/95">
+          <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3.5">
+            <Link href="/" className="text-[15px] font-semibold tracking-tight">
               {SITE_NAME}
             </Link>
-            <nav className="flex gap-6 text-sm text-felt-200">
+            <nav className="flex items-center gap-6 text-sm text-ink-300">
               {nav.map((item) => (
-                <Link key={item.href} href={item.href} className="hover:text-white">
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="transition-colors hover:text-white"
+                >
                   {item.label}
                 </Link>
               ))}
@@ -38,13 +46,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
         </header>
         <main>{children}</main>
-        <footer className="border-t border-felt-800 py-8 text-sm text-felt-300">
+        <footer className="border-t border-ink-800/70 py-10 text-sm text-ink-400">
           <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-4">
             <p>© {new Date().getFullYear()} {SITE_NAME}</p>
             <nav className="flex gap-6">
-              <Link href="/privacy/" className="hover:text-white">Privacy</Link>
-              <Link href="/terms/" className="hover:text-white">Terms</Link>
-              <a href={`mailto:${SUPPORT_EMAIL}`} className="hover:text-white">Support</a>
+              <Link href="/privacy/" className="transition-colors hover:text-white">Privacy</Link>
+              <Link href="/terms/" className="transition-colors hover:text-white">Terms</Link>
+              <a href={`mailto:${SUPPORT_EMAIL}`} className="transition-colors hover:text-white">Support</a>
             </nav>
           </div>
         </footer>

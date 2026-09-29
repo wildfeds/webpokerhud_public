@@ -28,19 +28,19 @@ export default async function DocPage({ params }: Props) {
 
   return (
     <article>
-      <h1 className="text-3xl font-bold">{doc.title}</h1>
+      <h1 className="text-3xl font-semibold tracking-tight text-white">{doc.title}</h1>
       <div
-        className="prose prose-invert mt-6 max-w-none"
+        className="prose prose-invert mt-6 max-w-none prose-a:text-accent-300 prose-a:no-underline hover:prose-a:underline"
         dangerouslySetInnerHTML={{ __html: doc.html }}
       />
-      <nav className="mt-12 flex justify-between border-t border-felt-800 pt-6 text-sm">
+      <nav className="mt-12 flex justify-between border-t border-ink-800 pt-6 text-sm">
         {prev ? (
-          <Link href={`/docs/${prev.slug}/`} className="text-felt-200 hover:text-white">
+          <Link href={`/docs/${prev.slug}/`} className="text-ink-200 hover:text-white">
             ← {prev.title}
           </Link>
         ) : <span />}
         {next ? (
-          <Link href={`/docs/${next.slug}/`} className="text-felt-200 hover:text-white">
+          <Link href={`/docs/${next.slug}/`} className="text-ink-200 hover:text-white">
             {next.title} →
           </Link>
         ) : <span />}

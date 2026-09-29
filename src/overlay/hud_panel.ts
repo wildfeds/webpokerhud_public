@@ -49,7 +49,7 @@ export class HudPanel {
     root.appendChild(style);
 
     const panel = el(doc, 'div', 'panel');
-    panel.appendChild(el(doc, 'div', 'title', 'Bovada HUD'));
+    panel.appendChild(el(doc, 'div', 'title', 'WebPokerHud'));
     this.statsEl   = panel.appendChild(el(doc, 'div'));
     this.sessionEl = panel.appendChild(el(doc, 'div', 'section'));
     this.seatsEl   = panel.appendChild(el(doc, 'div', 'section'));
