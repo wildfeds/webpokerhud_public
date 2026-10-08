@@ -10,7 +10,7 @@ export const LAUNCHED = process.env.NEXT_PUBLIC_LAUNCHED === 'true';
 // Firefox (AMO) is the store channel — the Chrome Web Store rejected the
 // extension under its gambling-content policy (2026-09-25), so Chrome is
 // offered as a manual install from the public repo's releases instead.
-export const FIREFOX_ADDON_URL = '#'; // set when the AMO listing is approved
+export const FIREFOX_ADDON_URL = 'https://addons.mozilla.org/firefox/addon/webpokerhud/';
 export const GITHUB_URL = 'https://github.com/wildfeds/webpokerhud_public';
 export const CHROME_SIDELOAD_URL = `${GITHUB_URL}/releases/latest`;
 export const DISCORD_URL = 'https://discord.gg/ghmQJrxxY';

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Install and usage docs
+    url: https://webpokerhud.com/docs/install/
+    about: Install steps for Firefox and Chrome, quickstart, stat glossary, data format
+  - name: Support email
+    url: mailto:webpokerhud@gmail.com
+    about: Account, purchase or privacy questions

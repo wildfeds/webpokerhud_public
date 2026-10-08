@@ -1,0 +1,15 @@
+name: Feature request
+description: A stat, a view, a table format, a site
+labels: [enhancement]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What would you like, and what decision would it help you make at the table?
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Table formats you play, other tools you've used for this, anything that shapes the design.

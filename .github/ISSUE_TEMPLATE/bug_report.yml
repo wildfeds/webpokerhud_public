@@ -1,0 +1,47 @@
+name: Bug report
+description: Something is wrong with the HUD, popup, panel or import/export
+labels: [bug]
+body:
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and install
+      description: e.g. "Firefox 131, installed from Firefox Add-ons" or "Chrome 129, manual install"
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: WebPokerHud version
+      description: Shown in about:addons / chrome://extensions
+    validations:
+      required: true
+  - type: dropdown
+    id: table
+    attributes:
+      label: Table type
+      options:
+        - 6-max cash
+        - 9-max cash
+        - Zone / fast-fold
+        - Tournament
+        - Not table-related (popup / panel / import / export / sign-in)
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what you expected
+    validations:
+      required: true
+  - type: textarea
+    id: console
+    attributes:
+      label: Console lines (filter "WebPokerHud")
+      description: On the table tab F12 → Console → filter WebPokerHud → select the table's frame with the frame picker. For popup/panel bugs use about:debugging → Inspect.
+      render: text
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: Screenshot
+      description: Drag an image here — chip placement bugs are visual.
