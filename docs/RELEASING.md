@@ -36,19 +36,21 @@ Snapshot (never push private history — see the memory/notes on the split):
 1. Clone `git@github.com:wildfeds/webpokerhud_public.git` into a scratch dir.
 2. `git archive HEAD | tar -x -C <stage>`; delete the ops-only docs
    (`docs/LAUNCH.md`, `docs/PURCHASES.md`, `docs/STORE_LISTING.md`,
-   `docs/AMO_LISTING.md`, `docs/POST_LAUNCH.md`, `docs/store_assets`,
-   `docs/store_upload`).
-3. Sweep: `grep -rIln "<your personal email>\|PRIVATE KEY\|service_role\|IPN_SECRET\|sk_live\|ghp_" <stage>`
+   `docs/AMO_LISTING.md`, `docs/POST_LAUNCH.md`, `docs/LAUNCHES.md`,
+   `docs/store_assets`,
+   `docs/store_upload`, and the whole `marketing/` folder).
+3. Sweep: `grep -rIln --exclude=RELEASING.md "<your personal email>\|PRIVATE KEY\|service_role\|IPN_SECRET\|sk_live\|ghp_" <stage>`
    must print nothing.
 4. In the clone: `git rm -rq .`, copy the stage over, `git add -A`,
    review `git diff --cached --stat`.
 5. Commit as `wildfeds <8731676+wildfeds@users.noreply.github.com>`
    (set `GIT_AUTHOR_*` and `GIT_COMMITTER_*`), tag `v<version>`, push
    `main` and the tag.
-6. GitHub → Releases → *Draft a new release* from the tag, title
-   `WebPokerHud <version>`, body = changelog entry, attach
-   `webpokerhud-chrome-<v>.zip`. The website's Chrome links resolve to
-   `/releases/latest`.
+6. `node scripts/github_release.mjs release <version>` — creates the
+   GitHub release from the tag with the changelog entry as body and
+   attaches `webpokerhud-chrome-<v>.zip` (idempotent; re-run to replace).
+   Needs the fine-grained token in `~/.config/webpokerhud/github_token`.
+   The website's Chrome links resolve to `/releases/latest`.
 
 ## 5. Website
 
@@ -60,3 +62,4 @@ the install flow.
 
 - [ ] Reload your own Firefox install from AMO (auto-update may take a day).
 - [ ] Note anything that went wrong here so the next release is smoother.
+- [ ] Add the release to `docs/LAUNCHES.md` (what shipped, day-zero numbers).

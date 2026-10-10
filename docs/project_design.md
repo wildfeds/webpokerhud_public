@@ -48,7 +48,9 @@ and IP-heavy analysis lives — which is also what makes the gating enforceable
 - Accounts (email sign-up) are needed anyway for subscriptions — Supabase
   auth with email magic-link covers registration for both the portal and
   support identity.
-- **Decision:** Discord + GitHub for support. No self-hosted forum for now;
+- **Decision (revised 2026-10-07):** GitHub Issues only for support at
+  launch; Discord shelved (plan kept in community/design.md). Original:
+  Discord + GitHub for support. No self-hosted forum for now;
   graduate to Discourse (or similar) only if volume justifies it.
   - Discord server for community/support chat (the norm for poker tools).
   - GitHub Issues/Discussions on the open-source client repo for bugs.

@@ -45,13 +45,14 @@ Fill in the blanks; each item says where the answer gets applied.
 
 ## 3. Community & support links (site footer/docs point nowhere yet)
 
-- [x] **Discord server** — create it.
+- [x] ~~**Discord server** — create it.~~ **Shelved 2026-10-07:** support is
+  GitHub Issues only for the initial launch; the invite below is unused.
 
   > Invite link: https://discord.gg/ghmQJrxxY — applied in site.ts.
 
 - [x] **Support email** — on the product domain once it exists.
 
-  > Address: webpokerhud@gmail.com — applied in site.ts (interim; swap to
+  > **Retired 2026-10-07 — no support email; GitHub Issues only.** Was: webpokerhud@gmail.com (interim; swap to
   > support@webpokerhud.com when domain mail is set up).
 
 - [ ] **Public GitHub repo** — depends on the repo split (§6). Docs' sideload

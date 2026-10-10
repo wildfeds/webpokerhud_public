@@ -2,10 +2,14 @@
 // are persisted; the stake-level list is populated from stored hands. HUD
 // visibility toggle and JSONL export live here too.
 import { HeroStats, StatsFilter, StakeLevelSummary } from '../analysis';
-import { formatStakeLevel, formatDollars, netChartSvg } from '../overlay';
+import { formatStakeLevel, formatDollars, netChartSvg, agoLabel } from '../overlay';
 import { HudMessage, HudResponse } from '../messages';
 import { mountAccountChip } from '../auth_ui';
 import { html, raw, setHtml, SafeHtml } from '../ui/html';
+import { shareGraphImage } from '../share';
+import {
+  NudgeState, NUDGE_KEY, shouldShowNudge, snooze, nudgeTarget, isFirefoxBuild,
+} from './rate_nudge';
 
 const statsEl  = document.getElementById('stats')!;
 const chartEl  = document.getElementById('chart')!;
@@ -15,8 +19,11 @@ const toggleEl = document.getElementById('hud-toggle') as HTMLInputElement;
 const exportEl = document.getElementById('export-btn') as HTMLButtonElement;
 const panelEl  = document.getElementById('panel-btn') as HTMLButtonElement;
 const importEl = document.getElementById('import-btn') as HTMLButtonElement;
+const psExportEl = document.getElementById('ps-export-btn') as HTMLButtonElement;
+const shareEl  = document.getElementById('share-btn') as HTMLButtonElement;
 const statusEl = document.getElementById('status')!;
 const storageEl = document.getElementById('storage')!;
+const healthEl = document.getElementById('health')!;
 
 const RANGE_KEY = 'stat_range';
 const STAKE_KEY = 'stat_stake';
@@ -25,6 +32,9 @@ const ALL = 'all';
 // Stake levels available under the current time filter (for value → sb/bb lookup).
 let levels: StakeLevelSummary[] = [];
 let savedStake = ALL;
+
+// What the chart currently shows — the share button renders exactly this.
+let shown: { stats: HeroStats; series: number[]; label: string; bb?: number } | null = null;
 
 // ── First-paint snapshot ─────────────────────────────────────────────────────
 // The background is an event page that Firefox suspends after ~30s idle, so a
@@ -166,6 +176,8 @@ function paint(stats: HeroStats | null, series: number[], selected: string): voi
     statsEl.className = 'muted';
     statsEl.textContent = 'No hands for this selection.';
     chartEl.replaceChildren();
+    shown = null;
+    shareEl.hidden = true;
     return;
   }
 
@@ -174,6 +186,8 @@ function paint(stats: HeroStats | null, series: number[], selected: string): voi
   const bb = level ? level.bb : (levels.length === 1 ? levels[0]!.bb : undefined);
   const label = level ? formatStakeLevel(level.sb, level.bb) : 'All levels';
   renderCard(stats, label, bb);
+  shown = { stats, series, label, bb };
+  shareEl.hidden = series.length < 2;
 
   // The chart SVG is trusted: generated locally from numbers (raw()).
   const svg = netChartSvg(series);
@@ -203,6 +217,38 @@ async function renderStats(): Promise<void> {
   persistSnapshot();
 }
 
+// ── Share graph ──────────────────────────────────────────────────────────────
+
+// One PNG of the current chart (title = stake level, subtitle = the headline
+// numbers, footer = the product line) saved to Downloads and, where the
+// browser allows, copied to the clipboard — ready to paste into a post.
+shareEl.addEventListener('click', async () => {
+  if (!shown) return;
+  shareEl.disabled = true;
+  statusEl.textContent = 'Rendering graph…';
+  try {
+    const { stats, series, label, bb } = shown;
+    const net = Math.round(stats.winRate * stats.handsPlayed);
+    const rangeText = rangeEl.options[rangeEl.selectedIndex]?.text.toLowerCase() ?? 'all time';
+    const parts = [
+      `${stats.handsPlayed.toLocaleString()} hands`,
+      formatDollars(net),
+      ...(bb ? [`${signed((stats.winRate / bb) * 100).replace('-', '−')} bb/100`] : []),
+      rangeText,
+    ];
+    const res = await shareGraphImage({
+      series,
+      title:    `${label === 'All levels' ? 'All stakes' : label} · Bovada NLHE`,
+      subtitle: parts.join(' · '),
+    });
+    statusEl.textContent = `Saved Downloads/webpokerhud/${res.file}${res.copied ? ' · copied to clipboard' : ''}`;
+  } catch (err) {
+    statusEl.textContent = `Share failed: ${err instanceof Error ? err.message : String(err)}`;
+  } finally {
+    shareEl.disabled = false;
+  }
+});
+
 // ── Export ───────────────────────────────────────────────────────────────────
 
 panelEl.addEventListener('click', () => {
@@ -222,6 +268,21 @@ exportEl.addEventListener('click', async () => {
   }
 });
 
+// The converter: the same hands as PokerStars-format text files, one per
+// table, for PokerTracker 4 / Hand2Note / Holdem Manager.
+psExportEl.addEventListener('click', async () => {
+  psExportEl.disabled = true;
+  statusEl.textContent = 'Converting…';
+  try {
+    const res = await send({ type: 'export_hands', format: 'pokerstars' });
+    statusEl.textContent = res.ok
+      ? `Wrote ${res.files ?? 0} PokerStars-format file(s) to Downloads/webpokerhud/pokerstars/`
+      : `Export failed: ${res.error}`;
+  } finally {
+    psExportEl.disabled = false;
+  }
+});
+
 // ── Import ───────────────────────────────────────────────────────────────────
 
 // Importing needs a file picker, and a popup closes (killing the import) the
@@ -231,6 +292,28 @@ importEl.addEventListener('click', () => {
   statusEl.textContent = 'Import moved to the Analysis Panel (⇪ Import, top bar).';
   chrome.runtime.openOptionsPage();
 });
+
+// ── Capture health ───────────────────────────────────────────────────────────
+
+// "Last hand captured: 3 min ago", plus a warning when any open table tab
+// reports a stalled feed (BF-009) — the one thing that tells a player the
+// capture is actually working. Read straight from storage.local; the
+// background keeps both values current.
+const LAST_HAND_KEY    = 'last_hand_at';
+const STALLED_TABS_KEY = 'stalled_tabs';
+
+async function renderHealth(): Promise<void> {
+  const stored = await chrome.storage.local.get({ [LAST_HAND_KEY]: 0, [STALLED_TABS_KEY]: {} });
+  const lastAt = Number(stored[LAST_HAND_KEY]) || 0;
+  const stalled = Object.keys(stored[STALLED_TABS_KEY] as Record<string, number>).length;
+  const parts: string[] = [];
+  if (lastAt > 0) parts.push(`Last hand captured: ${agoLabel(lastAt)}`);
+  if (stalled > 0) {
+    parts.push(`⚠ ${stalled === 1 ? 'a table tab has' : `${stalled} table tabs have`} stopped sending events — reload ${stalled === 1 ? 'it' : 'them'} to resume capture`);
+  }
+  healthEl.textContent = parts.join(' · ');
+  healthEl.className = stalled > 0 ? 'warn' : 'muted';
+}
 
 // ── Storage status ───────────────────────────────────────────────────────────
 
@@ -244,6 +327,42 @@ async function renderStorage(): Promise<void> {
     snapshot.storage = storageEl.textContent;
     persistSnapshot();
   }
+}
+
+// ── Rate-us nudge ────────────────────────────────────────────────────────────
+
+// After NUDGE_MIN_HANDS tracked hands, ask once for an AMO review (Firefox)
+// or a GitHub star (Chrome sideload). "Later" snoozes two weeks; "No thanks"
+// and clicking through both end it for good. Runs after the stats so it can
+// never delay the first paint.
+async function maybeShowNudge(): Promise<void> {
+  const nudgeEl = document.getElementById('nudge')!;
+  const [countRes, stored] = await Promise.all([
+    send({ type: 'get_hand_count' }),
+    chrome.storage.local.get({ [NUDGE_KEY]: null }),
+  ]);
+  const count = countRes.ok ? countRes.count ?? 0 : 0;
+  const saved = stored[NUDGE_KEY] as NudgeState | null;
+  if (!shouldShowNudge(count, saved)) return;
+
+  const target = nudgeTarget(isFirefoxBuild(chrome.runtime.getManifest() as unknown as Record<string, unknown>), count);
+  setHtml(nudgeEl, html`
+    <div class="nudge-head">${target.headline}</div>
+    <div class="nudge-body">${target.body}</div>
+    <div class="nudge-actions">
+      <a class="nudge-cta" id="nudge-go" href="${target.url}" target="_blank" rel="noreferrer">${target.cta}</a>
+      <button class="nudge-link" id="nudge-later">Later</button>
+      <button class="nudge-link" id="nudge-no">No thanks</button>
+    </div>`);
+  nudgeEl.hidden = false;
+
+  const settle = (state: NudgeState) => {
+    void chrome.storage.local.set({ [NUDGE_KEY]: state });
+    nudgeEl.hidden = true;
+  };
+  nudgeEl.querySelector('#nudge-go')!.addEventListener('click', () => settle({ state: 'rated' }));
+  nudgeEl.querySelector('#nudge-later')!.addEventListener('click', () => settle(snooze()));
+  nudgeEl.querySelector('#nudge-no')!.addEventListener('click', () => settle({ state: 'dismissed' }));
 }
 
 // ── Host permissions ─────────────────────────────────────────────────────────
@@ -289,6 +408,8 @@ async function init(): Promise<void> {
   mark('levels+stats');
   await renderStorage();
   mark('storage');
+  await renderHealth();
+  await maybeShowNudge();
   console.debug(`[WebPokerHud] popup timing (ms from doc start): ${timing.join(' ')}`);
 }
 

@@ -21,8 +21,8 @@ const features = [
     body: 'The free tier is 100% client-side. Hands live in your browser and never touch our servers.',
   },
   {
-    title: 'One-click export',
-    body: 'Your hands are yours: export everything as JSONL/JSON in an open, documented format at any time.',
+    title: 'Hand history converter',
+    body: 'Export every hand in PokerStars format for PokerTracker 4, Hand2Note or Holdem Manager — or as JSONL in an open, documented format. No 24-hour wait.',
   },
   {
     title: 'Pro analysis',
@@ -37,6 +37,7 @@ const supportedNow = [
   '6-max tables: full HUD, per-seat stat chips, position stats',
   'Multi-tabling — every table gets its own HUD',
   'Analysis panel: overview, hand history with replays, JSON export/import',
+  'Hand history converter: PokerStars-format export for PokerTracker 4, Hand2Note, Holdem Manager',
   'Firefox on desktop (128 or newer) — one-click install from Firefox Add-ons',
   'Chrome on desktop — manual install (see below)',
 ];
@@ -98,15 +99,16 @@ export default function Home() {
           v{VERSION} · Free, open-source Firefox extension
         </p>
         <h1 className="relative mx-auto mt-6 max-w-3xl text-4xl font-semibold tracking-tight text-white sm:text-6xl">
-          Know your table.{' '}
+          A free HUD for Bovada.{' '}
           <span className="bg-gradient-to-r from-accent-300 to-accent-500 bg-clip-text text-transparent">
-            In real time.
+            In your browser.
           </span>
         </h1>
         <p className="relative mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-ink-300">
-          {SITE_NAME} is a browser extension that overlays live stats on your
-          poker table — hands tracked automatically, winnings graphed, and in
-          the free tier your data never leaves your machine.
+          {SITE_NAME} overlays live stats on your Bovada table, keeps every
+          hand you play on your own machine, and converts your history to
+          PokerStars format for PokerTracker or Hand2Note — free and open
+          source. Only the deeper server-side analysis costs anything.
         </p>
         <div className="relative mt-10 flex flex-col items-center gap-3">
           {LAUNCHED ? (

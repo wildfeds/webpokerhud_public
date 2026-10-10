@@ -1,3 +1,5 @@
+> **Status 2026-10-07 — shelved.** Support for the initial launch is GitHub Issues only (no Discord, no Discussions). This plan is kept for if/when a chat channel is wanted.
+
 # Support & Community — Design
 
 Implementation design for support and community channels. The product-level

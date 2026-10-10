@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { SITE_NAME, SUPPORT_EMAIL } from '@/lib/site';
+import { ISSUES_URL, SITE_NAME } from '@/lib/site';
 
 export const metadata: Metadata = { title: 'Terms of Service' };
 
@@ -59,8 +59,8 @@ export default function Terms() {
           prices shown at checkout, and add the stated number of days to your
           subscription immediately on confirmation. Cryptocurrency payments
           are irreversible by nature; if something goes wrong — a payment not
-          credited, a mistaken purchase — contact{' '}
-          <a className="underline" href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>{' '}
+          credited, a mistaken purchase — open an issue on{' '}
+          <a className="underline" href={ISSUES_URL}>GitHub</a>{' '}
           and we will make it right where we reasonably can, including
           discretionary refunds. When prepaid time expires, Pro features lock
           and nothing is charged.
@@ -97,7 +97,8 @@ export default function Terms() {
 
         <H2>Contact</H2>
         <p>
-          <a className="underline" href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>
+          Support, bug reports and account requests:{' '}
+          <a className="underline" href={ISSUES_URL}>GitHub Issues</a>.
         </p>
       </div>
     </article>

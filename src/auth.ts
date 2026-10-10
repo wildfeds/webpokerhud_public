@@ -34,6 +34,7 @@ export interface AuthUser {
 export interface AuthState {
   user: AuthUser;
   tier: Tier;
+  proUntil?: string | null;   // ISO expiry of prepaid Pro time; null = no expiry
 }
 
 interface StoredSession {
@@ -135,17 +136,20 @@ async function refreshSession(session: StoredSession): Promise<StoredSession | n
   };
 }
 
-async function fetchTier(accessToken: string): Promise<Tier> {
+// Tier plus the Pro expiry — the pricing page promises the extension shows
+// the date, so it is part of the auth state rather than a second request.
+async function fetchEntitlement(accessToken: string): Promise<{ tier: Tier; proUntil: string | null }> {
   try {
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/entitlements?select=plan,expires_at`,
       { headers: authHeaders(accessToken) });
-    if (!res.ok) return 'free';
+    if (!res.ok) return { tier: 'free', proUntil: null };
     const rows = await res.json() as { plan?: string; expires_at?: string | null }[];
     const row = Array.isArray(rows) ? rows[0] : undefined;
-    return effectiveTier(row?.plan, row?.expires_at);
+    const tier = effectiveTier(row?.plan, row?.expires_at);
+    return { tier, proUntil: tier === 'pro' ? row?.expires_at ?? null : null };
   } catch {
-    return 'free';
+    return { tier: 'free', proUntil: null };
   }
 }
 
@@ -168,7 +172,7 @@ export async function getAuthState(): Promise<AuthState | null> {
   const token = await getAccessToken();
   if (!token) return null;
   const session = (await readSession())!;
-  return { user: session.user, tier: await fetchTier(token) };
+  return { user: session.user, ...await fetchEntitlement(token) };
 }
 
 // Interactive Google sign-in. Throws with a user-facing message on failure
@@ -194,7 +198,7 @@ export async function signIn(): Promise<AuthState> {
     expiresAt:    Date.now() + tokens.expiresIn * 1000,
     user,
   });
-  return { user, tier: await fetchTier(tokens.accessToken) };
+  return { user, ...await fetchEntitlement(tokens.accessToken) };
 }
 
 export async function signOut(): Promise<void> {

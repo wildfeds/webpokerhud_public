@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { SITE_NAME, SUPPORT_EMAIL } from '@/lib/site';
+import { ISSUES_URL, SITE_NAME } from '@/lib/site';
 
 export const metadata: Metadata = { title: 'Privacy Policy' };
 
@@ -86,9 +86,9 @@ export default function Privacy() {
         <H2>Retention and deletion</H2>
         <p>
           Account and subscription data is kept while your account exists.
-          To delete your account and its data, email{' '}
-          <a className="underline" href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>{' '}
-          from the account&apos;s address; we may retain purchase records
+          To delete your account and its data, open a request on{' '}
+          <a className="underline" href={ISSUES_URL}>GitHub Issues</a>; we will
+          confirm you control the account before deleting, and we may retain purchase records
           where bookkeeping rules require it. Your hand data needs no deletion
           request — it was never on our servers.
         </p>
@@ -106,8 +106,8 @@ export default function Privacy() {
         <H2>Changes and contact</H2>
         <p>
           If this policy changes materially we will update the effective date
-          above. Questions:{' '}
-          <a className="underline" href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>.
+          above. Questions: open an issue on{' '}
+          <a className="underline" href={ISSUES_URL}>GitHub</a>.
         </p>
       </div>
     </article>

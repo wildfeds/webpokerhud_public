@@ -69,7 +69,7 @@
     }
     main { padding: 20px 24px 60px; max-width: 1100px; }
     .controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-    select, #refresh {
+    select, #refresh, #import, #export, #export-ps {
       background: #26264a;
       color: #e0e0e0;
       border: 1px solid rgba(255,255,255,0.15);
@@ -77,9 +77,9 @@
       padding: 5px 8px;
       font-size: 13px;
     }
-    #refresh { cursor: pointer; }
-    #refresh:hover { background: #32325e; }
-    #refresh:disabled { opacity: 0.6; cursor: default; }
+    #refresh, #import, #export, #export-ps { cursor: pointer; }
+    #refresh:hover, #import:hover, #export:hover, #export-ps:hover { background: #32325e; }
+    #refresh:disabled, #import:disabled, #export:disabled, #export-ps:disabled { opacity: 0.6; cursor: default; }
     .tabs { display: flex; gap: 4px; margin-top: 12px; }
     .tab {
       padding: 7px 14px;
@@ -107,6 +107,14 @@
     .card .k { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
     .card .v { font-size: 22px; font-weight: 600; color: #fff; margin-top: 4px; }
     .section { margin-bottom: 28px; }
+    .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+    .small-btn {
+      background: transparent; border: 1px solid rgba(255,255,255,0.2); color: var(--muted);
+      border-radius: 4px; padding: 3px 10px; font-size: 12px; cursor: pointer;
+    }
+    .small-btn:hover { color: #fff; border-color: rgba(255,255,255,0.4); }
+    .small-btn:disabled { opacity: 0.6; cursor: default; }
+    .small-btn[hidden] { display: none; }
     table { width: 100%; border-collapse: collapse; }
     th, td { padding: 7px 10px; text-align: right; white-space: nowrap; }
     th:first-child, td:first-child { text-align: left; }
@@ -266,6 +274,14 @@
     .act.hero .who { color: #ffd479; font-weight: 600; }
     .board-cards { font-size: 18px; letter-spacing: 2px; }
     .result-line { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
+    .replay-tools { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); }
+    .replay-tools details { margin-top: 8px; }
+    .replay-tools summary { color: var(--muted); font-size: 12px; cursor: pointer; }
+    .replay-tools pre {
+      margin: 6px 0 0; padding: 10px; border-radius: 6px; background: rgba(0,0,0,0.25);
+      font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      white-space: pre-wrap; overflow-x: auto; user-select: all;
+    }
     /* Stat glossary popover */
     .stat-term {
       cursor: help;
@@ -317,6 +333,8 @@
       <button id="refresh" title="Recompute all stats from the latest stored hands">↻ Refresh</button>
       <button id="import" title="Import hand-history JSONL files (multi-select supported)">⇪ Import</button>
       <input type="file" id="import-file" accept=".jsonl,.ndjson,application/x-ndjson" multiple hidden />
+      <button id="export" title="Every hand as JSONL (the open hand.v1 format), one file per table, to Downloads/webpokerhud/">⇩ Export</button>
+      <button id="export-ps" title="Every hand as PokerStars-format text, one file per table, to Downloads/webpokerhud/pokerstars/ — import the folder into PokerTracker 4, Hand2Note or Holdem Manager">⇩ For PT4 / Hand2Note</button>
       <span id="summary-line" class="muted"></span>
     </div>
     <div id="server-banner" hidden></div>
@@ -340,7 +358,11 @@
       </div>
 
       <div class="section">
-        <h2>Winnings ($) vs hands</h2>
+        <div class="section-head">
+          <h2>Winnings ($) vs hands</h2>
+          <button id="share-chart" class="small-btn" hidden
+            title="Save this graph as a PNG (and copy it to the clipboard) to post on Reddit or a forum">⤓ Share as image</button>
+        </div>
         <div id="chart" class="chart-wrap"></div>
       </div>
 

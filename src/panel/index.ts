@@ -24,6 +24,7 @@ import {
 import { HudMessage, HudResponse } from '../messages';
 import { mountAccountChip } from '../auth_ui';
 import { html, raw, setHtml, SafeHtml } from '../ui/html';
+import { shareGraphImage, forumHandText } from '../share';
 
 const rangeEl   = document.getElementById('range') as HTMLSelectElement;
 const levelEl   = document.getElementById('level') as HTMLSelectElement;
@@ -139,6 +140,27 @@ async function initControls(): Promise<void> {
     }
   });
 
+  // Exports: the open JSONL format, and the converter (PokerStars-format
+  // text files, one per table, for PokerTracker 4 / Hand2Note / HM3).
+  const exportBtn = document.getElementById('export') as HTMLButtonElement;
+  const psBtn     = document.getElementById('export-ps') as HTMLButtonElement;
+  const runExport = async (btn: HTMLButtonElement, format: 'jsonl' | 'pokerstars', idle: string) => {
+    btn.disabled = true;
+    btn.textContent = 'Writing…';
+    try {
+      const res = await send({ type: 'export_hands', format });
+      btn.title = res.ok
+        ? `Wrote ${res.files ?? 0} file(s) to Downloads/webpokerhud/${format === 'pokerstars' ? 'pokerstars/' : ''}`
+        : `Export failed: ${res.error}`;
+      btn.textContent = res.ok ? `✓ ${res.files ?? 0} file(s)` : '⚠ Failed';
+      setTimeout(() => { btn.textContent = idle; }, 3000);
+    } finally {
+      btn.disabled = false;
+    }
+  };
+  exportBtn.addEventListener('click', () => void runExport(exportBtn, 'jsonl', '⇩ Export'));
+  psBtn.addEventListener('click', () => void runExport(psBtn, 'pokerstars', '⇩ For PT4 / Hand2Note'));
+
   renderHandFilterBar();
   await reloadLevels(String(stored.stat_stake));
 }
@@ -213,8 +235,13 @@ const LINE_TOTAL = '#7ec97e';
 const LINE_RED   = '#ff6b6b';
 const LINE_EV    = '#f0a860';
 
-function renderChart(total: number[], ev: number[]): void {
+// What the Overview chart currently shows, for the share button.
+let shownChart: { total: number[]; ev: number[]; stake: StakeStats[] } | null = null;
+
+function renderChart(total: number[], ev: number[], stake: StakeStats[]): void {
   const el = document.getElementById('chart')!;
+  shownChart = total.length >= 2 ? { total, ev, stake } : null;
+  (document.getElementById('share-chart') as HTMLButtonElement).hidden = !shownChart;
   // Hide the EV line while it tracks the total exactly (no adjusted hands yet).
   const evDiffers = ev.some((v, i) => Math.round(v) !== Math.round(total[i] ?? 0));
   const svg = multiSeriesChartSvg([
@@ -234,6 +261,42 @@ function renderChart(total: number[], ev: number[]): void {
     ${evDiffers ? item(LINE_EV, 'All-in EV', 'lineEv', Math.round(last(ev))) : ''}
   </div>${raw(svg)}`);
 }
+
+// Share the Overview graph as a PNG card: stake/range in the title, the
+// headline numbers in the subtitle, the product footer — saved to Downloads
+// and copied to the clipboard where the browser allows it.
+const shareChartEl = document.getElementById('share-chart') as HTMLButtonElement;
+shareChartEl.addEventListener('click', async () => {
+  if (!shownChart) return;
+  shareChartEl.disabled = true;
+  const idle = shareChartEl.textContent;
+  shareChartEl.textContent = 'Rendering…';
+  try {
+    const { total, ev, stake } = shownChart;
+    const hands = stake.reduce((a, s) => a + s.hands, 0);
+    const net   = stake.reduce((a, s) => a + s.net, 0);
+    const netBb = stake.reduce((a, s) => a + (s.bb > 0 ? s.net / s.bb : 0), 0);
+    const bb100 = hands > 0 ? (netBb / hands) * 100 : 0;
+    const level = levels.find(l => l.level === levelEl.value);
+    const stakeLabel = level ? formatStakeLevel(level.sb, level.bb) : 'All stakes';
+    const rangeText = rangeEl.options[rangeEl.selectedIndex]?.text.toLowerCase() ?? 'all time';
+    const res = await shareGraphImage({
+      series:   total,
+      evSeries: ev,
+      title:    `${stakeLabel} · Bovada NLHE`,
+      subtitle: `${hands.toLocaleString()} hands · ${formatDollars(net)} · ${signed(bb100).replace('-', '−')} bb/100 · ${rangeText}`,
+    });
+    shareChartEl.textContent = res.copied ? '✓ Saved & copied' : '✓ Saved to Downloads';
+    shareChartEl.title = `Downloads/webpokerhud/${res.file}`;
+    setTimeout(() => { shareChartEl.textContent = idle; }, 3000);
+  } catch (err) {
+    shareChartEl.textContent = idle;
+    bannerEl.hidden = false;
+    bannerEl.textContent = `⚠ Share failed: ${err instanceof Error ? err.message : String(err)}`;
+  } finally {
+    shareChartEl.disabled = false;
+  }
+});
 
 function renderLeaks(leaks: Leak[]): void {
   const el = document.getElementById('leaks')!;
@@ -795,7 +858,32 @@ async function showReplay(handId: string, tableId: string): Promise<void> {
   setHtml(el, html`<span class="empty">Loading…</span>`);
   const res = await send({ type: 'get_hand', handId, tableId });
   const hand = res.ok ? res.hand : null;
-  setHtml(el, hand ? replayHtml(hand) : html`<span class="empty">Hand not found.</span>`);
+  if (!hand) {
+    setHtml(el, html`<span class="empty">Hand not found.</span>`);
+    return;
+  }
+  // The replay plus the hand as forum text: one click copies it (the 2+2
+  // converter layout people paste into hand-discussion threads), and the
+  // text itself is a fold-out so it can be read or hand-edited first.
+  const text = forumHandText(hand);
+  setHtml(el, html`${replayHtml(hand)}
+    <div class="replay-tools">
+      <button class="small-btn" id="copy-hand" title="Copy this hand as plain text for TwoPlusTwo / Reddit">⧉ Copy as text</button>
+      <details class="hand-text"><summary>Show text</summary><pre>${text}</pre></details>
+    </div>`);
+  const btn = el.querySelector<HTMLButtonElement>('#copy-hand')!;
+  btn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      btn.textContent = '✓ Copied';
+    } catch {
+      // Clipboard refused (no gesture / permission): open the text so it can
+      // be selected by hand.
+      el.querySelector<HTMLDetailsElement>('details.hand-text')!.open = true;
+      btn.textContent = 'Select the text below';
+    }
+    setTimeout(() => { btn.textContent = '⧉ Copy as text'; }, 2500);
+  });
 }
 
 // ── Locked (Pro-only) views ──────────────────────────────────────────────────
@@ -855,7 +943,7 @@ async function renderAll(): Promise<void> {
   lastStats = data.stats;
   hidePopover();   // examples may have changed with the filter
   renderSummary(data.stakeStats);
-  renderChart(data.netSeries, data.evSeries);
+  renderChart(data.netSeries, data.evSeries, data.stakeStats);
   renderAdvanced(data.stats);
   renderLeaks(data.leaks);
 

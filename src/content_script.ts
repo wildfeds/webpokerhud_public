@@ -4,7 +4,8 @@
 
 import { HUD_MESSAGE_SOURCE } from './constants';
 import { BovadaConnector } from './connector';
-import { HudPanel, SeatChipOverlay } from './overlay';
+import { HudPanel, SeatChipOverlay, stallState, STALL_CHECK_MS } from './overlay';
+import { isHandLive } from './overlay/format';
 import { HeroStats, SeatSessionStats } from './analysis';
 import { GameState } from './model';
 import { HudMessage, HudResponse } from './messages';
@@ -108,17 +109,30 @@ connector.on('hand_complete', (hand) => {
     .catch((err: unknown) => console.error('[WebPokerHud] failed to reach background:', err));
 });
 
-// Diagnostics (BF-009 hunt): a stuck HUD on a live table means events stopped
+// Capture watchdog (BF-009): a stuck HUD on a live table means events stopped
 // flowing or the connector throws on each one. Guard the dispatch so one
-// poisoned event can't look like silence, and watchdog the feed itself.
+// poisoned event can't look like silence; watchdog the feed itself and, when
+// it goes quiet, say so in the HUD strip and on the toolbar badge — the
+// failure must never be silent. The strip clears the moment events resume.
 let lastEventAt = 0;
 let handleErrors = 0;
 let stallWarned = false;
+let stallShown = false;
+
+function setStalled(stalled: boolean): void {
+  if (stalled === stallShown) return;
+  stallShown = stalled;
+  void send({ type: 'capture_stalled', stalled }).catch(() => undefined);
+}
 
 window.addEventListener('message', (event: MessageEvent) => {
   if (!event.data || event.data.source !== HUD_MESSAGE_SOURCE) return;
   lastEventAt = Date.now();
   stallWarned = false;
+  if (stallShown) {
+    panel?.setStall(null);
+    setStalled(false);
+  }
   try {
     connector.handleEvent(event.data.msg as Record<string, unknown>);
   } catch (err) {
@@ -131,14 +145,17 @@ window.addEventListener('message', (event: MessageEvent) => {
 });
 
 setInterval(() => {
-  if (lastEventAt === 0 || stallWarned) return;   // never saw events / already flagged
+  if (lastEventAt === 0) return;   // never saw events in this frame
   const quietMs = Date.now() - lastEventAt;
-  if (quietMs > 120_000) {
+  const state = stallState(quietMs, !!lastGs && isHandLive(lastGs), true);
+  panel?.setStall(state);
+  setStalled(state !== null);
+  if (state && !stallWarned) {
     stallWarned = true;
-    console.warn(`[WebPokerHud] FEED STALLED: no game events for ${Math.round(quietMs / 1000)}s`
+    console.warn(`[WebPokerHud] FEED STALLED (${state.kind}): no game events for ${Math.round(quietMs / 1000)}s`
       + ` in this frame (handleEvent errors so far: ${handleErrors}).`
       + ' Check the RGS socket state in DevTools → Network → WS.');
   }
-}, 30_000);
+}, STALL_CHECK_MS);
 
 console.log('[WebPokerHud] content script ready');

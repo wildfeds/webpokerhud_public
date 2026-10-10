@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "WebPokerHud",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Live poker HUD with real-time stats and hand-history analytics for your browser.",
   "{{chrome}}.key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqgTexpEaNyzHY1FeDhhUkbYis+TBYFRGc88N8+cuHq1yLNRE/xr+XuiJS3PDwO1b2MbiQMZKrVAaBo8ePvkCXWuFmZ36pPtAePPSRK1+S8UFY23XN3ETpjpr0H6U8ISThUsXt7s/s6LSbhd6YtbT7zkkcvecuB+AIyioydMKjqLksZrbffpXIP5bwR1FJ+qyqTWlFngURd6Kf58Tmty/DURUBaZD1x0QmgLRwlbSNU9XvUBoV+wZRl8Fhvj11IFoGmeC0DgPsH682oCW/k2jSD9YvQwhvAjI5ffhgsHYQ5dRBbj/l7qEPElsKRJOh4gb9NArvY4gE4Nlm1AVUQ8YGwIDAQAB",
   "{{firefox}}.browser_specific_settings": {

@@ -3,7 +3,8 @@
 // Storage layer (Layer 3).
 
 import {
-  IndexedDBStore, CachedHandStore, exportHands, importHandsJsonl, ensurePersistentStorage,
+  IndexedDBStore, CachedHandStore, exportHands, exportHandsPokerStars, importHandsJsonl,
+  ensurePersistentStorage,
 } from './storage';
 import {
   getHeroStats, getNetSeries, getSeatStats, getHand,
@@ -29,18 +30,53 @@ ensurePersistentStorage()
   .then(info => console.log('[WebPokerHud] storage persisted:', info.persisted))
   .catch(err => console.warn('[WebPokerHud] persist request failed:', err));
 
-async function handleMessage(message: HudMessage): Promise<HudResponse> {
+// Capture health for the popup: when the last hand landed, and which tabs
+// currently report a stalled feed. Kept in storage.local (the event page
+// is torn down between messages) under LAST_HAND_KEY / STALLED_TABS_KEY.
+export const LAST_HAND_KEY    = 'last_hand_at';
+export const STALLED_TABS_KEY = 'stalled_tabs';   // Record<tabId, since ms>
+
+async function setStalledTab(tabId: number | undefined, stalled: boolean): Promise<void> {
+  if (tabId === undefined) return;
+  const key = String(tabId);
+  const stored = await chrome.storage.local.get({ [STALLED_TABS_KEY]: {} });
+  const tabs = { ...(stored[STALLED_TABS_KEY] as Record<string, number>) };
+  if (stalled) tabs[key] = tabs[key] ?? Date.now();
+  else delete tabs[key];
+  await chrome.storage.local.set({ [STALLED_TABS_KEY]: tabs });
+  // A "!" on the toolbar icon of the affected tab; nothing on healthy tabs.
+  try {
+    await chrome.action.setBadgeBackgroundColor({ color: '#ff6b6b', tabId });
+    await chrome.action.setBadgeText({ text: stalled ? '!' : '', tabId });
+  } catch (err) {
+    console.debug('[WebPokerHud] badge update failed:', err);
+  }
+}
+
+// Closed tabs can't be stalled; keep the record honest.
+chrome.tabs.onRemoved.addListener((tabId) => { void setStalledTab(tabId, false); });
+
+async function handleMessage(message: HudMessage, sender: chrome.runtime.MessageSender): Promise<HudResponse> {
   switch (message.type) {
     case 'hand_complete': {
       await store.save(message.hand);
       const count = await store.count();
       console.log(`[WebPokerHud] saved hand ${message.hand.handId} (${count} total)`);
+      void chrome.storage.local.set({ [LAST_HAND_KEY]: Date.now() });
       return { ok: true, count };
     }
+    case 'capture_stalled':
+      await setStalledTab(sender.tab?.id, message.stalled);
+      return { ok: true };
     case 'get_hand_count':
       return { ok: true, count: await store.count() };
     case 'export_hands':
-      return { ok: true, files: await exportHands(store) };
+      return {
+        ok: true,
+        files: message.format === 'pokerstars'
+          ? await exportHandsPokerStars(store)
+          : await exportHands(store),
+      };
     case 'get_hero_stats':
       return { ok: true, stats: await getHeroStats(store, message.filter) };
     case 'get_net_series':
@@ -80,11 +116,11 @@ async function handleMessage(message: HudMessage): Promise<HudResponse> {
   }
 }
 
-chrome.runtime.onMessage.addListener((message: HudMessage, _sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message: HudMessage, sender, sendResponse) => {
   const cold = !firstMessageSeen;
   firstMessageSeen = true;
   const t0 = performance.now();
-  const timed = handleMessage(message).finally(() => {
+  const timed = handleMessage(message, sender).finally(() => {
     const ms = Math.round(performance.now() - t0);
     if (ms > 30 || cold) {
       console.debug(`[WebPokerHud] bg ${message.type} took ${ms}ms`

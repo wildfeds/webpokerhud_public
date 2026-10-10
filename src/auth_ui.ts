@@ -19,6 +19,20 @@ function avatarHtml(state: AuthState): SafeHtml {
   return html`<span class="account-avatar account-avatar-fallback">${letter}</span>`;
 }
 
+// "Oct 7, 2027" — the prepaid Pro expiry, the date the pricing page promises
+// the extension shows.
+function shortDate(iso: string): string {
+  const t = Date.parse(iso);
+  return Number.isFinite(t)
+    ? new Date(t).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
+    : iso;
+}
+
+function proUntilTitle(state: AuthState): string {
+  if (state.tier !== 'pro') return 'Free tier';
+  return state.proUntil ? `Pro — prepaid time ends ${shortDate(state.proUntil)}` : 'Pro';
+}
+
 function render(el: HTMLElement, state: AuthState | null, busy = false, error = ''): void {
   if (busy) {
     setHtml(el, html`<span class="account-note">Signing in…</span>`);
@@ -33,7 +47,8 @@ function render(el: HTMLElement, state: AuthState | null, busy = false, error = 
   setHtml(el, html`
     ${avatarHtml(state)}
     <span class="account-name" title="${state.user.email}">${state.user.name}</span>
-    <span class="account-tier ${state.tier}">${state.tier === 'pro' ? 'Pro' : 'Free'}</span>
+    <span class="account-tier ${state.tier}" title="${proUntilTitle(state)}">${state.tier === 'pro' ? 'Pro' : 'Free'}</span>
+    ${state.tier === 'pro' && state.proUntil ? html`<span class="account-note">until ${shortDate(state.proUntil)}</span>` : ''}
     <button class="account-signout" id="account-signout" title="Sign out">Sign out</button>`);
 }
 

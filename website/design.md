@@ -29,7 +29,7 @@ The site has four jobs, in priority order:
 Plus two legally required static pages before Chrome Web Store submission:
 **Privacy Policy** and **Terms of Service** (roadmap §7).
 
-Out of scope for the website: the analysis API itself and the forum (Discord +
+Out of scope for the website: the analysis API itself and the forum (shelved; GitHub Issues only — was Discord +
 GitHub cover support, roadmap §2). The site ships as a static export today —
 no servers to run — but the stack is chosen so that server-side features
 (API routes, middleware, server rendering) can be turned on later without a

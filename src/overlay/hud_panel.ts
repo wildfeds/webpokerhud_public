@@ -6,6 +6,7 @@ import {
   statLines, sessionLine, liveInfo, isHandLive, cardLabel, cardColor,
   formatChips, formatUsd, potOdds,
 } from './format';
+import { StallState, stallMessage } from './stall';
 
 const PANEL_CSS = `
   :host { all: initial; }
@@ -31,6 +32,18 @@ const PANEL_CSS = `
   .cards span { font-weight: 600; margin-right: 4px; }
   .pot { color: #ffd479; }
   .odds { color: #f0a860; }
+  .stall {
+    margin: 0 0 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    background: rgba(255, 107, 107, 0.18);
+    border: 1px solid rgba(255, 107, 107, 0.6);
+    color: #ffd0d0;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+  .stall.idle { background: rgba(240, 168, 96, 0.16); border-color: rgba(240, 168, 96, 0.6); color: #ffe2bf; }
+  .stall .hint { display: block; font-weight: 400; color: #e0e0e0; margin-top: 2px; }
 `;
 
 export class HudPanel {
@@ -39,6 +52,7 @@ export class HudPanel {
   private sessionEl: HTMLElement;
   private seatsEl: HTMLElement;
   private liveEl: HTMLElement;
+  private stallEl: HTMLElement;
 
   constructor(doc: Document) {
     this.host = doc.createElement('div');
@@ -50,6 +64,8 @@ export class HudPanel {
 
     const panel = el(doc, 'div', 'panel');
     panel.appendChild(el(doc, 'div', 'title', 'WebPokerHud'));
+    this.stallEl   = panel.appendChild(el(doc, 'div', 'stall'));
+    this.stallEl.hidden = true;
     this.statsEl   = panel.appendChild(el(doc, 'div'));
     this.sessionEl = panel.appendChild(el(doc, 'div', 'section'));
     this.seatsEl   = panel.appendChild(el(doc, 'div', 'section'));
@@ -117,6 +133,20 @@ export class HudPanel {
       this.liveEl.appendChild(el(document, 'div', 'odds',
         `call ${formatUsd(odds.toCall)} into ${formatUsd(odds.pot)} → ${Math.round(odds.equityPct)}% needed`));
     }
+  }
+
+  // Capture-stall strip (BF-009): visible while the feed looks dead, with
+  // the one remedy that works — reloading the table tab. Null clears it.
+  setStall(state: StallState | null): void {
+    if (!state) {
+      this.stallEl.hidden = true;
+      return;
+    }
+    clear(this.stallEl);
+    this.stallEl.className = `stall ${state.kind}`;
+    this.stallEl.append(`⚠ ${state.kind === 'mid_hand' ? 'Capture stalled' : 'Table quiet'}`);
+    this.stallEl.appendChild(el(document, 'span', 'hint', stallMessage(state)));
+    this.stallEl.hidden = false;
   }
 
   setVisible(visible: boolean): void {

@@ -13,7 +13,9 @@ import { AuthState } from './auth';
 export type HudMessage =
   | { type: 'hand_complete'; hand: Hand }
   | { type: 'get_hand_count' }
-  | { type: 'export_hands' }
+  // format: 'jsonl' (default, the open hand.v1 format) or 'pokerstars'
+  // (PokerStars-style text for PT4 / Hand2Note / HM3 import).
+  | { type: 'export_hands'; format?: 'jsonl' | 'pokerstars' }
   | { type: 'get_hero_stats'; filter?: StatsFilter }
   | { type: 'get_net_series'; filter?: StatsFilter }
   | { type: 'get_panel_data'; window: number; filter?: StatsFilter }
@@ -23,6 +25,9 @@ export type HudMessage =
   | { type: 'get_hand'; handId: string; tableId?: string }
   | { type: 'import_hands'; jsonl: string }
   | { type: 'get_storage_info' }
+  // Content script → background: this tab's capture feed went quiet (or
+  // resumed). Drives the toolbar badge and the popup's capture-health line.
+  | { type: 'capture_stalled'; stalled: boolean }
   | { type: 'get_auth_state' }
   | { type: 'sign_in' }
   | { type: 'sign_out' };

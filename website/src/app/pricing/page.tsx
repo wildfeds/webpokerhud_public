@@ -81,8 +81,8 @@ export default function Pricing() {
         <p>
           <strong className="text-ink-100">Prepaid time, not a subscription trap.</strong>{' '}
           You pay for 1 or 12 months up front (USDC). When it runs out, nothing
-          renews and nothing is charged — we email you a reminder and you top
-          up if you want to.
+          renews and nothing is charged — the extension shows you your expiry
+          date, and you top up if you want to.
         </p>
         <p>
           <strong className="text-ink-100">Why crypto?</strong> Card processors

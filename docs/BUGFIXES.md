@@ -192,8 +192,19 @@ Symptom / Root cause / Fix / Verified
   offending event, and a FEED STALLED watchdog (2 min of silence in a
   previously active frame). Next occurrence identifies itself in the
   frame's console.
+- **Visible indicator shipped (2026-10-09):** the failure is no longer
+  silent. `src/overlay/stall.ts` (pure, tested) classifies a quiet feed as
+  `mid_hand` (≥ 60 s without events while a hand was in progress — a dead
+  feed) or `idle` (≥ 180 s between hands — dead feed or empty table); the
+  HUD panel shows a red/amber strip telling the player to reload the table
+  tab, the toolbar icon gets a "!" badge on that tab (`capture_stalled`
+  message → `chrome.action.setBadgeText`), and the popup reads "Last hand
+  captured: N min ago" plus a warning naming how many table tabs report a
+  stall (`last_hand_at` / `stalled_tabs` in storage.local). Everything
+  clears the moment events resume. The console warning stays.
 - **Planned fix once confirmed:** tap the Atmosphere XHR/fetch fallback
-  transport alongside WebSocket.
+  transport alongside WebSocket, so the stall self-heals instead of asking
+  for a reload.
 
 ---
 
